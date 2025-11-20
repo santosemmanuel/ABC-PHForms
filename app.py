@@ -8,7 +8,7 @@ import json
 app = Flask(__name__)
 
 
-pdf_path = "Test.pdf"
+pdf_path = "template_cf1.pdf"
     
 # PdfWriter().write(output_pdf, pdf)
 
@@ -48,25 +48,26 @@ def fill_cf1(data):
     form_fields = list(fillpdfs.get_form_fields(pdf_path).keys())
     print(form_fields)
 
-    # data_dict = {
-    #     form_fields[0]: data["lastName"]
-    # }
-    fields = ['untitled1', 'untitled2', 'untitled3', 'untitled4', 'untitled5', 'untitled6',
-          'untitled7', 'untitled8', 'untitled9', 'untitled10', 'untitled11', 'untitled12',
-          'untitled13', 'untitled14', 'untitled15', 'untitled16', 'untitled17', 'untitled18',
-          'untitled19', 'untitled20', 'untitled21', 'untitled22', 'untitled23', 'untitled24',
-          'untitled25', 'untitled26', 'untitled27', 'untitled28', 'untitled29', 'untitled30',
-          'untitled31', 'untitled32', 'untitled33', 'untitled34', 'untitled35', 'untitled36',
-          'untitled37', 'untitled38', 'untitled39', 'untitled40', 'untitled80', 'untitled81',
-          'untitled82', 'untitled83', 'untitled84', 'untitled85', 'untitled86', 'untitled87',
-          'untitled88', 'untitled89', 'untitled90', 'untitled91', 'untitled92', 'untitled93',
-          'untitled94', 'untitled95', 'untitled0', '0', '1', '2', '3', '4', '5', '6', '7', '8',
-          '9', '10', '11', '12', '13', '14', '15', '16', '17', '18', '19', '20', '22', '23',
-          '24', '25', '26', '27', '28', '29', '30', 'Text Field0', 'Text Field1']
+    patients_pin = data['pin'].split('-')
+    data_dict = {
+        form_fields[10]: "Yes_xqqa",
+    }
+#     fields = ['untitled1', 'untitled2', 'untitled3', 'untitled4', 'untitled5', 'untitled6',
+#           'untitled7', 'untitled8', 'untitled9', 'untitled10', 'untitled11', 'untitled12',
+#           'untitled13', 'untitled14', 'untitled15', 'untitled16', 'untitled17', 'untitled18',
+#           'untitled19', 'untitled20', 'untitled21', 'untitled22', 'untitled23', 'untitled24',
+#           'untitled25', 'untitled26', 'untitled27', 'untitled28', 'untitled29', 'untitled30',
+#           'untitled31', 'untitled32', 'untitled33', 'untitled34', 'untitled35', 'untitled36',
+#           'untitled37', 'untitled38', 'untitled39', 'untitled40', 'untitled80', 'untitled81',
+#           'untitled82', 'untitled83', 'untitled84', 'untitled85', 'untitled86', 'untitled87',
+#           'untitled88', 'untitled89', 'untitled90', 'untitled91', 'untitled92', 'untitled93',
+#           'untitled94', 'untitled95', 'untitled0', '0', '1', '2', '3', '4', '5', '6', '7', '8',
+#           '9', '10', '11', '12', '13', '14', '15', '16', '17', '18', '19', '20', '22', '23',
+#           '24', '25', '26', '27', '28', '29', '30', 'Text Field0', 'Text Field1']
 
-# Create dict with dummy values
-    dummy_data = {field: f"dummy_{i}" for i, field in enumerate(fields)}
-    fillpdfs.write_fillable_pdf(pdf_path, output_pdf, dummy_data)
+# # Create dict with dummy values
+#     dummy_data = {field: f"dummy_{i}" for i, field in enumerate(fields)}
+    fillpdfs.write_fillable_pdf(pdf_path, output_pdf, data_dict)
 
 def fill_cf2():
     pass
