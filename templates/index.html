@@ -1,11 +1,12 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PhilHealth CF1 / CF2 / CSF Form</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <style>
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>PhilHealth CF1 / CF2 / CSF Form</title>
+        <link href="{{ url_for('static', filename='css/bootstrap.min.css') }}"
+              rel="stylesheet">
+        <style>
          .narrow-container {
         max-width: 60%;
         margin: auto;
@@ -24,8 +25,8 @@
     label, h5, h4 {
         font-size: 0.8rem;
     }
-    </style>
-    <style>
+        </style>
+        <style>
 /* Make all text inputs, selects, and textareas uppercase */
 #philhealthForm input[type="text"],
 #philhealthForm input[type="date"],
@@ -38,266 +39,265 @@
 #philhealthForm ::placeholder {
     text-transform: uppercase;
 }
-</style>
-</head>
-<body class="bg-light">
-
-<div class="conatiner narrow-container">
-    <h2 class="text-center my-4">PhilHealth CF1 / CF2 / CSF Form</h2>
-
-    <form id="philhealthForm" >
-
-        <!-- ============================
+        </style>
+    </head>
+    <body class="bg-light">
+        <div class="conatiner narrow-container">
+            <h2 class="text-center my-4">PhilHealth CF1 / CF2 / CSF Form</h2>
+            <form id="philhealthForm">
+                <!-- ============================
               PART I — MEMBER INFORMATION
         ============================= -->
-        <div class="card mb-4">
-            <div class="card-header bg-success text-white">Part I — Member Information</div>
-            <div class="card-body row g-3">
-
-                <div class="col-md-4">
-                    <label class="form-label">PIN</label>
-                    <input type="text" class="form-control" name="pin">
-                </div>
-
-                <div class="col-md-4">
-                    <label class="form-label">Last Name</label>
-                    <input type="text" class="form-control" name="lastName">
-                </div>
-
-                <div class="col-md-4">
-                    <label class="form-label">First Name</label>
-                    <input type="text" class="form-control" name="firstName">
-                </div>
-
-                <div class="col-md-3">
-                    <label class="form-label">Name Extension</label>
-                    <select class="form-select" name="nameExt">
-                        <option value=""></option>
-                        <option>Jr.</option>
-                        <option>Sr.</option>
-                        <option>II</option>
-                        <option>III</option>
-                        <option>IV</option>
-                        <option>V</option>
-                    </select>
-                </div>
-
-                <div class="col-md-3">
-                    <label class="form-label">Middle Name</label>
-                    <input type="text" class="form-control" name="middleName">
-                </div>
-
-                <div class="col-md-3">
-                    <label class="form-label">Date of Birth</label>
-                    <input type="date" class="form-control" name="dob">
-                </div>
-
-                <div class="col-md-3">
-                    <label class="form-label">Sex</label>
-                    <select class="form-select" name="sex">
-                        <option value="">Choose...</option>
-                        <option>Male</option>
-                        <option>Female</option>
-                    </select>
-                </div>
-
-                <h5 class="mt-4">Address</h5>
-
-                <div class="col-md-6"><input class="form-control" name="street" placeholder="Street"></div>
-                <div class="col-md-3">
-                    <select class="form-select" name="barangay" id="barangay">
-                        <option value="">Choose barangay...</option>
-                        <option>Abuyogon</option>
-                        <option>Anonang</option>
-                        <option>Arado</option>
-                        <option>Balao</option>
-                        <option>Balatson</option>
-                        <option>Balorinay</option>
-                        <option>Bobon</option>
-                        <option>Buenavista</option>
-                        <option>Buri</option>
-                        <option>Caanislagan</option>
-                        <option>Cadahunan</option>
-                        <option>Cagangon</option>
-                        <option>Calao</option>
-                        <option>Cali</option>
-                        <option>Calsadahay</option>
-                        <option>Candag-on</option>
-                        <option>Cansiboy</option>
-                        <option>Catagbacan</option>
-                        <option>Dumalag (Pusod)</option>
-                        <option>Damulu-an</option>
-                        <option>Dina-ayan</option>
-                        <option>Esperanza</option>
-                        <option>Gamay</option>
-                        <option>Gitablan</option>
-                        <option>Hapunan</option>
-                        <option>Hibonawan</option>
-                        <option>Hugpa East</option>
-                        <option>Hugpa West</option>
-                        <option>Ilihan</option>
-                        <option>Kagbana</option>
-                        <option>Kalipayan</option>
-                        <option>Kaparasanan</option>
-                        <option>Laguiwan</option>
-                        <option>Libas</option>
-                        <option>Limburan</option>
-                        <option>Logsongan</option>
-                        <option>Maabab</option>
-                        <option>Maghubas</option>
-                        <option>Mahagnao</option>
-                        <option>Malabca</option>
-                        <option>Malaguinabot</option>
-                        <option>Malaihao (San Ramon)</option>
-                        <option>Matin-ao</option>
-                        <option>Moguing</option>
-                        <option>Paghudlan</option>
-                        <option>Paitan</option>
-                        <option>Pangdan</option>
-                        <option>Patag</option>
-                        <option>Patong</option>
-                        <option>Pawa</option>
-                        <option>Roxas</option>
-                        <option>Sambel</option>
-                        <option>San Esteban</option>
-                        <option>San Fernando</option>
-                        <option>San Jose East</option>
-                        <option>San Jose West</option>
-                        <option>San Pablo</option>
-                        <option>Tabuanon</option>
-                        <option>Tagadtaran</option>
-                        <option>Taghuyan</option>
-                        <option>Takin</option>
-                        <option>Tambis (Naboya)</option>
-                        <option>Tambuko</option>
-                        <option>Toloyao</option>
-                        <option>Villa Aurora</option>
-                        <option>Villa Corazon</option>
-                        <option>Villa Patria</option>
-                        <option>Villa Rosas (Cabang)</option>
-                    </select>
-                </div>
-                <!-- 
+                <div class="card mb-4">
+                    <div class="card-header bg-success text-white">Part I — Member Information</div>
+                    <div class="card-body row g-3">
+                        <div class="col-md-4">
+                            <label class="form-label">PIN</label>
+                            <input type="text" class="form-control" name="pin">
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Last Name</label>
+                            <input type="text" class="form-control" name="lastName">
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">First Name</label>
+                            <input type="text" class="form-control" name="firstName">
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">Name Extension</label>
+                            <select class="form-select" name="nameExt">
+                                <option value=""></option>
+                                <option>Jr.</option>
+                                <option>Sr.</option>
+                                <option>II</option>
+                                <option>III</option>
+                                <option>IV</option>
+                                <option>V</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">Middle Name</label>
+                            <input type="text" class="form-control" name="middleName">
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">Date of Birth</label>
+                            <input type="date" class="form-control" name="dob">
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">Sex</label>
+                            <select class="form-select" name="sex">
+                                <option value="">Choose...</option>
+                                <option>Male</option>
+                                <option>Female</option>
+                            </select>
+                        </div>
+                        <h5 class="mt-4">Address</h5>
+                        <div class="col-md-6">
+                            <input class="form-control" name="street" placeholder="Street">
+                        </div>
+                        <div class="col-md-3">
+                            <select class="form-select" name="barangay" id="barangay">
+                                <option value="">Choose barangay...</option>
+                                <option>Abuyogon</option>
+                                <option>Anonang</option>
+                                <option>Arado</option>
+                                <option>Balao</option>
+                                <option>Balatson</option>
+                                <option>Balorinay</option>
+                                <option>Bobon</option>
+                                <option>Buenavista</option>
+                                <option>Buri</option>
+                                <option>Caanislagan</option>
+                                <option>Cadahunan</option>
+                                <option>Cagangon</option>
+                                <option>Calao</option>
+                                <option>Cali</option>
+                                <option>Calsadahay</option>
+                                <option>Candag-on</option>
+                                <option>Cansiboy</option>
+                                <option>Catagbacan</option>
+                                <option>Dumalag</option>
+                                <option>Damulu-an</option>
+                                <option>Dina-ayan</option>
+                                <option>Esperansa</option>
+                                <option>Gamay</option>
+                                <option>Gitablan</option>
+                                <option>Hapunan</option>
+                                <option>Hibonawan</option>
+                                <option>Hugpa East</option>
+                                <option>Hugpa West</option>
+                                <option>Ilihan</option>
+                                <option>Kagbana</option>
+                                <option>Kalipayan</option>
+                                <option>Kaparasanan</option>
+                                <option>Laguiwan</option>
+                                <option>Libas</option>
+                                <option>Limburan</option>
+                                <option>Logsongan</option>
+                                <option>Maabab</option>
+                                <option>Maghubas</option>
+                                <option>Mahagnao</option>
+                                <option>Malabca</option>
+                                <option>Malaguinabot</option>
+                                <option>Malaihao</option>
+                                <option>Matin-ao</option>
+                                <option>Moguing</option>
+                                <option>Poblacion District I</option>
+                                <option>Poblacion District II</option>
+                                <option>Poblacion District III</option>
+                                <option>Poblacion District IV</option>
+                                <option>Poblacion District V</option>
+                                <option>Poblacion District VI</option>
+                                <option>Poblacion District VII</option>
+                                <option>Poblacion District VIII</option>
+                                <option>Poblacion District IX</option>
+                                <option>Paghudlan</option>
+                                <option>Paitan</option>
+                                <option>Pangdan</option>
+                                <option>Patag</option>
+                                <option>Patong</option>
+                                <option>Pawa</option>
+                                <option>Roxas</option>
+                                <option>Sambel</option>
+                                <option>San Esteban</option>
+                                <option>San Fernando</option>
+                                <option>San Jose East</option>
+                                <option>San Jose West</option>
+                                <option>San Pablo</option>
+                                <option>Tabuanon</option>
+                                <option>Tagadtaran</option>
+                                <option>Taghuyan</option>
+                                <option>Takin</option>
+                                <option>Tambis</option>
+                                <option>Tambuko</option>
+                                <option>Toloyao</option>
+                                <option>Villa Aurora</option>
+                                <option>Villa Corazon</option>
+                                <option>Villa Patria</option>
+                                <option>Villa Rosas</option>
+                            </select>
+                        </div>
+                        <!--
                 <div class="col-md-3"><input class="form-control" name="city" placeholder="City/Municipality"></div>
                 <div class="col-md-3"><input class="form-control" name="province" placeholder="Province"></div>
                 <div class="col-md-3"><input class="form-control" name="country" placeholder="Country"></div>
-                <div class="col-md-3"><input class="form-control" name="zipcode" placeholder="Zipcode"></div> -->
-
-                <h5 class="mt-4">Contact Information</h5>
-                <!-- <div class="col-md-4"><input class="form-control" name="landline" placeholder="Landline No."></div> -->
-                <div class="col-md-4"><input class="form-control" name="mobile" placeholder="Mobile No."></div>
-                <div class="col-md-4"><input class="form-control" name="email" placeholder="Email Address"></div>
-
-            </div>
-        </div>
-
-        <!-- ============================
-             PART II — PATIENT DETAILS
-        ============================= -->
-        <div class="card mb-4">
-            <div class="card-header bg-success text-white">Part II — Patient Information</div>
-            <div class="card-body">
-
-                <label class="form-label">Is the patient the member?</label>
-                <select class="form-select mb-3" id="patientIsMember">
-                    <option value="yes">Yes</option>
-                    <option value="no">No</option>
-                </select>
-
-                <!-- Dependent details -->
-                <div id="dependentSection" class="row g-3 d-none">
-
-                    <div class="col-md-4">
-                        <label class="form-label">PIN of Dependent</label>
-                        <input type="text" class="form-control" name="depPin">
-                    </div>
-
-                    <h5 class="mt-3">Name of Patient (Dependent)</h5>
-
-                    <div class="col-md-4"><input class="form-control" name="depLname" placeholder="Last Name"></div>
-                    <div class="col-md-4"><input class="form-control" name="depFname" placeholder="First Name"></div>
-                    <div class="col-md-4"><input class="form-control" name="depExt" placeholder="Name Extension"></div>
-                    <div class="col-md-4"><input class="form-control" name="depMname" placeholder="Middle Name"></div>
-                    <div class="col-md-4"><input type="date" class="form-control" name="depDob"></div>
-                    <div class="col-md-4">
-                        <select class="form-select" name="depSex">
-                            <option>Male</option>
-                            <option>Female</option>
-                        </select>
-                    </div>
-
-                    <div class="col-md-6">
-                        <label class="form-label">Relationship to Member</label>
-                        <select class="form-select" name="relationship">
-                            <option>Child</option>
-                            <option>Parent</option>
-                            <option>Spouse</option>
-                        </select>
+<div class="col-md-3"><input class="form-control" name="zipcode" placeholder="Zipcode"></div> -->
+                        <h5 class="mt-4">Contact Information</h5>
+                        <!-- <div class="col-md-4"><input class="form-control" name="landline" placeholder="Landline No."></div> -->
+                        <div class="col-md-4">
+                            <input class="form-control" name="mobile" placeholder="Mobile No.">
+                        </div>
+                        <div class="col-md-4">
+                            <input class="form-control" name="email" placeholder="Email Address">
+                        </div>
                     </div>
                 </div>
-
-            </div>
-        </div>
-
-      <!-- ============================
+                <!-- ============================
+             PART II — PATIENT DETAILS
+        ============================= -->
+                <div class="card mb-4">
+                    <div class="card-header bg-success text-white">Part II — Patient Information</div>
+                    <div class="card-body">
+                        <label class="form-label">Is the patient the member?</label>
+                        <select class="form-select mb-3" id="patientIsMember">
+                            <option value="yes">Yes</option>
+                            <option value="no">No</option>
+                        </select>
+                        <!-- Dependent details -->
+                        <div id="dependentSection" class="row g-3 d-none">
+                            <div class="col-md-4">
+                                <label class="form-label">PIN of Dependent</label>
+                                <input type="text" class="form-control" name="depPin">
+                            </div>
+                            <h5 class="mt-3">Name of Patient (Dependent)</h5>
+                            <div class="col-md-4">
+                                <input class="form-control" name="depLname" placeholder="Last Name">
+                            </div>
+                            <div class="col-md-4">
+                                <input class="form-control" name="depFname" placeholder="First Name">
+                            </div>
+                            <div class="col-md-4">
+                                <input class="form-control" name="depExt" placeholder="Name Extension">
+                            </div>
+                            <div class="col-md-4">
+                                <input class="form-control" name="depMname" placeholder="Middle Name">
+                            </div>
+                            <div class="col-md-4">
+                                <input type="date" class="form-control" name="depDob">
+                            </div>
+                            <div class="col-md-4">
+                                <select class="form-select" name="depSex">
+                                    <option>Male</option>
+                                    <option>Female</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Relationship to Member</label>
+                                <select class="form-select" name="relationship">
+                                    <option>Child</option>
+                                    <option>Parent</option>
+                                    <option>Spouse</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- ============================
       PART III — MEMBER CERTIFICATION
 ============================= -->
-<div class="card mb-4">
-    <div class="card-header bg-success text-white">Part III — Member Certification</div>
-    <div class="card-body row g-3">
-
-        <!-- MEMBER OR REPRESENTATIVE -->
-        <div class="col-md-12">
-
-            <div class="form-check">
-                <input type="radio" id="radioMember" name="signee" class="form-check-input" value="member" checked>
-                <label class="form-check-label" for="radioMember">Member</label>
-            </div>
-
-            <div class="form-check">
-                <input type="radio" id="radioRep" name="signee" class="form-check-input" value="representative">
-                <label class="form-check-label" for="radioRep">Representative</label>
-            </div>
-
-        </div>
-
-        <!-- Representative Section -->
-        <div id="representativeSection" class="row g-3 d-none mt-2">
-            
-            <h5>If Representative</h5>
-
-            <div class="col-md-4">
-                <input class="form-control" name="repName" placeholder="Representative Name">
-            </div>
-
-            <div class="col-md-4">
-                <select class="form-select" name="repRelationship">
-                    <option value="">Relationship to Member</option>
-                    <option>Spouse</option>
-                    <option>Child</option>
-                    <option>Parent</option>
-                    <option>Sibling</option>
-                    <option>Others</option>
-                </select>
-            </div>
-
-            <div class="col-md-12">
-                <label class="form-label mt-2">Reason for signing on behalf of member</label>
-                <select class="form-select" name="repReason">
-                    <option>Member is incapacitated</option>
-                    <option>Others</option>
-                </select>
-            </div>
-
-        </div>
-
-    </div>
-</div>
-
-        <!-- ============================
+                <div class="card mb-4">
+                    <div class="card-header bg-success text-white">Part III — Member Certification</div>
+                    <div class="card-body row g-3">
+                        <!-- MEMBER OR REPRESENTATIVE -->
+                        <div class="col-md-12">
+                            <div class="form-check">
+                                <input type="radio"
+                                       id="radioMember"
+                                       name="signee"
+                                       class="form-check-input"
+                                       value="member"
+                                       checked>
+                                <label class="form-check-label" for="radioMember">Member</label>
+                            </div>
+                            <div class="form-check">
+                                <input type="radio"
+                                       id="radioRep"
+                                       name="signee"
+                                       class="form-check-input"
+                                       value="representative">
+                                <label class="form-check-label" for="radioRep">Representative</label>
+                            </div>
+                        </div>
+                        <!-- Representative Section -->
+                        <div id="representativeSection" class="row g-3 d-none mt-2">
+                            <h5>If Representative</h5>
+                            <div class="col-md-4">
+                                <input class="form-control" name="repName" placeholder="Representative Name">
+                            </div>
+                            <div class="col-md-4">
+                                <select class="form-select" name="repRelationship">
+                                    <option value="">Relationship to Member</option>
+                                    <option>Spouse</option>
+                                    <option>Child</option>
+                                    <option>Parent</option>
+                                    <option>Sibling</option>
+                                    <option>Others</option>
+                                </select>
+                            </div>
+                            <div class="col-md-12">
+                                <label class="form-label mt-2">Reason for signing on behalf of member</label>
+                                <select class="form-select" name="repReason">
+                                    <option>Member is incapacitated</option>
+                                    <option>Others</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- ============================
                   EMPLOYMENT SECTION
         ============================= -->
-        <!-- <div class="card mb-4">
+                <!-- <div class="card mb-4">
             <div class="card-header bg-success text-white">Employment</div>
             <div class="card-body row g-3">
 
@@ -315,78 +315,64 @@
                 </div>
 
             </div>
-        </div> -->
-
-        <!-- ============================
+</div> -->
+                <!-- ============================
                   CF2 — HEALTH INSTITUTION
         ============================= -->
-        <div class="card mb-4">
-            <div class="card-header bg-success text-white">CF2 — Health Care Institution</div>
-            <div class="card-body row g-3">
-
-                <!-- <div class="col-md-4"><input class="form-control" name="pan" placeholder="PhilHealth Accreditation Number (PAN)"></div>
+                <div class="card mb-4">
+                    <div class="card-header bg-success text-white">CF2 — Health Care Institution</div>
+                    <div class="card-body row g-3">
+                        <!-- <div class="col-md-4"><input class="form-control" name="pan" placeholder="PhilHealth Accreditation Number (PAN)"></div>
                 <div class="col-md-4"><input class="form-control" name="hciName" placeholder="Name of Health Care Institution"></div>
                 <div class="col-md-4"><input class="form-control" name="hciAddress" placeholder="Address"></div>
                 <div class="col-md-4"><input class="form-control" name="hciCity" placeholder="City/Municipality"></div>
                 <div class="col-md-4"><input class="form-control" name="hciProvince" placeholder="Province"></div> -->
                         <!-- HCI acutomatic NO -->
-                <!-- <div id="referralSection" class="row g-3 d-none">
+                        <!-- <div id="referralSection" class="row g-3 d-none">
                     <div class="col-md-4"><input class="form-control" placeholder="Referring HCI Name"></div>
                     <div class="col-md-4"><input class="form-control" placeholder="Street / Bldg / No."></div>
                     <div class="col-md-4"><input class="form-control" placeholder="City/Municipality"></div>
                     <div class="col-md-4"><input class="form-control" placeholder="Province"></div>
-                </div> -->
-
-                <!-- <h4 class="mt-4">Confinement Period</h4> -->
-
-                <!-- <div class="col-md-3"><label>Date Admitted</label><input type="date" class="form-control"></div>
+</div> -->
+                        <!-- <h4 class="mt-4">Confinement Period</h4> -->
+                        <!-- <div class="col-md-3"><label>Date Admitted</label><input type="date" class="form-control"></div>
                 <div class="col-md-3"><label>Time Admitted</label><input type="time" class="form-control"></div>
                 <div class="col-md-3"><label>Date Discharged</label><input type="date" class="form-control"></div>
-                <div class="col-md-3"><label>Time Discharged</label><input type="time" class="form-control"></div> -->
-
-                <h4 class="mt-4">Patient Disposition</h4>
-                <select class="form-select">
-                    <option>Improved</option>
-                    <option>Recovered</option>
-                    <option>Home/Discharged AMA</option>
-                    <option>Absconded</option>
-                    <option>Expired</option>
-                    <option>Transferred/Referred</option>
-                </select>
-
-                <!-- <h4 class="mt-4">Type of Accommodation</h4>
+<div class="col-md-3"><label>Time Discharged</label><input type="time" class="form-control"></div> -->
+                        <h4 class="mt-4">Patient Disposition</h4>
+                        <select class="form-select">
+                            <option>Improved</option>
+                            <option>Recovered</option>
+                            <option>Home/Discharged AMA</option>
+                            <option>Absconded</option>
+                            <option>Expired</option>
+                            <option>Transferred/Referred</option>
+                        </select>
+                        <!-- <h4 class="mt-4">Type of Accommodation</h4>
                 <select class="form-select">
                     <option>Non-Private(Charity/Service)</option>
                 </select> Fix-->
-<!-- 
-                <input class="form-control mt-3" placeholder="Admission Diagnosis"> Fix-->
-
-                <!-- <h4 class="mt-4">Discharge Diagnosis</h4> -->
-                <!-- <input class="form-control mt-2" placeholder="ICD-10 Code/s">  Fix--> 
-
-                
-                <!-- <input class="form-control" placeholder="Related Procedure/s">
+                        <!--
+<input class="form-control mt-3" placeholder="Admission Diagnosis"> Fix-->
+                        <!-- <h4 class="mt-4">Discharge Diagnosis</h4> -->
+                        <!-- <input class="form-control mt-2" placeholder="ICD-10 Code/s">  Fix-->
+                        <!-- <input class="form-control" placeholder="Related Procedure/s">
                 <input class="form-control" placeholder="Procedure">
                 <input class="form-control mt-2" placeholder="RVS Code">
-                <input class="form-control mt-2" type="date"> Fix-->
-
-                <!-- <h4 class="mt-4">Special Considerations</h4> -->
-                <!-- <div class="form-check"><input type="checkbox" class="form-check-input"> Day 0 ARV</div> Fix -->
-
-                <!-- <h4 class="mt-4">Certification</h4>
+<input class="form-control mt-2" type="date"> Fix-->
+                        <!-- <h4 class="mt-4">Special Considerations</h4> -->
+                        <!-- <div class="form-check"><input type="checkbox" class="form-check-input"> Day 0 ARV</div> Fix -->
+                        <!-- <h4 class="mt-4">Certification</h4>
                 <input class="form-control" placeholder="Accreditation No">
                 <input class="form-control mt-2" placeholder="Printed Name">
                 <input class="form-control mt-2" type="date">
-                <div class="form-check mt-2"><input type="checkbox" class="form-check-input"> No Co-pay</div> Fix-->
-
-
-            </div>
-        </div>
-
-        <!-- ============================
+<div class="form-check mt-2"><input type="checkbox" class="form-check-input"> No Co-pay</div> Fix-->
+                    </div>
+                </div>
+                <!-- ============================
               CSF — BENEFIT CONSUMPTION
         ============================= -->
-        <!-- <div class="card mb-4">
+                <!-- <div class="card mb-4">
             <div class="card-header bg-success text-white">CSF — Benefit Consumption</div>
             <div class="card-body">
 
@@ -406,15 +392,11 @@
                 <input class="form-control mt-2" type="date">
 
             </div>
-        </div> Fix -->
-
-        <button class="btn btn-success w-100 mb-5">Submit</button>
-
-    </form>
-
-</div>
-
-<script>
+</div> Fix -->
+                <button class="btn btn-success w-100 mb-5">Submit</button>
+            </form>
+        </div>
+        <script>
     // Show dependent fields
     document.getElementById("patientIsMember").addEventListener("change", function() {
         document.getElementById("dependentSection").classList.toggle(
@@ -429,8 +411,8 @@
     });
 
     
-</script>
-<script>
+        </script>
+        <script>
     const radioMember = document.getElementById("radioMember");
     const radioRep = document.getElementById("radioRep");
     const repSection = document.getElementById("representativeSection");
@@ -448,9 +430,8 @@
 
     // Initialize on load
     updateSection();
-</script>
-
-<script>
+        </script>
+        <script>
 document.getElementById("philhealthForm").addEventListener("submit", async function(e) {
     e.preventDefault(); // Prevent default form submit
 
@@ -519,9 +500,6 @@ document.getElementById("philhealthForm").addEventListener("submit", async funct
         alert("An error occurred while submitting the form.");
     }
 });
-</script>
-
-
-
-</body>
+        </script>
+    </body>
 </html>
