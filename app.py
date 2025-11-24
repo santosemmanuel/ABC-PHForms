@@ -1,13 +1,11 @@
-from flask import Flask, render_template, request, jsonify, send_file
-from PyPDF2 import PdfMerger
+from flask import Flask, render_template, request, jsonify
 from fillpdf import fillpdfs
-from datetime import date, datetime
-import json
-import os
-
+from pdfrw import PdfReader as PdfRwReader, PdfWriter as PdfRwWriter, PageMerge, PdfDict, PdfName
+from datetime import datetime, date
 from pdf2image import convert_from_path
-import img2pdf
-from pathlib import Path
+# import img2pdf
+import os
+import json
 
 # Initialize Flask app
 app = Flask(__name__)
@@ -27,6 +25,30 @@ app = Flask(__name__)
 
 today = date.today()
 
+def flatten_pdf(input_pdf, output_pdf):
+    pdf = PdfRwReader(input_pdf)
+    for page in pdf.pages:
+        annots = page.get(PdfName('Annots'))
+        if not annots:
+            continue
+        for annot in annots:
+            subtype = annot.get(PdfName('Subtype'))
+            if subtype != PdfName('Widget'):
+                continue
+            ap = annot.get(PdfName('AP'))
+            if not isinstance(ap, PdfDict):
+                continue
+            n_ap = ap.get(PdfName('N'))
+            if n_ap and hasattr(n_ap, 'stream'):
+                try:
+                    PageMerge(page).add(n_ap).render()
+                except Exception as e:
+                    print("Skipping annotation:", e)
+        # Remove annotations so fields become static drawings
+        page[PdfName('Annots')] = []
+    PdfRwWriter().write(output_pdf, pdf)
+    print(f"Flattened PDF saved as {output_pdf}")
+
 @app.route("/")
 def index():
     return render_template('index.html')
@@ -37,22 +59,19 @@ def submit_form():
     pretty_json_string = json.dumps(data, indent=4)
     patient_data = dict(data)
     print(pretty_json_string)
+
     fill_cf1(patient_data)
     fill_csf(patient_data)
     fill_soa(patient_data)
     # Debug: see the data received
     # TODO: Save to database or process
-    cf1_images = pdf_to_image_pdf("output_cf1.pdf", "cf1_img.pdf")
-    csf_images = pdf_to_image_pdf("output_csf.pdf", "csf_img.pdf")
-    soa_images = pdf_to_image_pdf("output_soa.pdf", "soa_img.pdf")
+   
+    # Merge all flattened PDFs
+    merge_pdfs(["output_cf1.pdf", "output_csf.pdf", "output_soa.pdf"], "final_merged.pdf")
 
-    # Merge all image-based PDFs
-    merge_pdfs(["cf1_img.pdf", "csf_img.pdf", "soa_img.pdf"], "final_merged.pdf")
-    clean_files([
-        "output_cf1.pdf", "output_csf.pdf", "output_soa.pdf",
-        "cf1_img.pdf", "csf_img.pdf", "soa_img.pdf",
-        *cf1_images, *csf_images, *soa_images
-        ])
+    # Optional: delete individual PDFs
+    #clean_files(["output_cf1.pdf", "output_csf.pdf", "output_soa.pdf"])
+
     return jsonify({"status": "success", "message": "Form received"})
 
 def fill_cf1(data):
@@ -62,7 +81,6 @@ def fill_cf1(data):
 
     try:
         form_fields_cf1 = list(fillpdfs.get_form_fields(pdf_path).keys())
-        print(form_fields_cf1)
         patients_pin = data['pin'].split('-')
         birthDate = data['dob'].split('-')
 
@@ -216,6 +234,7 @@ def fill_cf1(data):
 
     
         fillpdfs.write_fillable_pdf(pdf_path, output_pdf, data_dict)
+        fillpdfs.flatten_pdf(output_pdf, output_pdf, as_images=True)
     except Exception as e:
         print(f"This is the error {e}")
 
@@ -233,32 +252,204 @@ def fill_csf(data):
     patients_pin = data['pin'].split('-')
     birthDate = data['dob'].split('-')
 
+    doctor = "MA. QUEENA JOVE Q. SERRANO MD"
+
     memberMale = "Yes_xqqa" if data['sex'].lower() == "male" else None
     memberFemale = "Yes_xqqa" if data['sex'].lower() == "female" else None
-    print
+
+    dep_pin = ["","",""]
+    dep_bd = ["","",""]
+    depChild = depParent = depSpouse = ""
+    if data["dependent"]:
+        dep_pin = data["dependent"]["depPin"].split("-")
+        dep_bd = data["dependent"]["depDob"].split("-")
+
+        relationship_value = data["dependent"]["relationship"].lower()
+
+        match relationship_value:
+            case "child":
+                depChild = "Yes_ltey"
+            case "parent":
+                depParent = "Yes_ltey"
+            case "spouse":
+                depSpouse = "Yes_ltey"
+
+    isRepresentative = repPrintedName = repRelationSpouse = repRelationChild = repRelationSibling = repRelationParent = repRelationOthers = repOther = repIncapacitated = ""
+    signMember = "Yes_ltey"
+    
+    memberMiddleI = data.get('middleName', '')
+    memberPrintedName = f"{data.get('firstName', '').upper()} {memberMiddleI[0].upper() + '.' if memberMiddleI else ''} {data.get('lastName', '').upper()} {data.get('nameExt', '')}".strip()
+    memberSignDate = [today.month, today.day, today.year]
+    repSignDate = ["", "", ""]
+    consentName = memberPrintedName
+    consentIsRepresentativeSign = ""
+    consentIsMemberSign = ""
+
+    if data.get('signee','').lower() == "member" and data.get('patientIsMember','') == "yes":
+        consentIsMemberSign = "Yes_ltey"
+    
+    if data.get('signee', '').lower() == "representative":
+        isRepresentative = "Yes_ltey"
+        consentIsRepresentativeSign = "Yes_ltey"
+        signMember = None
+        memberPrintedName = ""
+        memberSignDate = ["", "", ""]
+
+        rep = data.get('representative', {})
+        repPrintedName = rep.get('repName')
+        consentName = repPrintedName
+        repSignDate = [today.month, today.day, today.year]
+        isRepresentative = "Yes_ltey"
+
+        repRel_value = rep.get('repRelationship', '').lower()
+
+        match repRel_value:
+            case "spouse":
+                repRelationSpouse = "Yes_ltey"
+            case "child":
+                repRelationChild = "Yes_ltey"
+            case "sibling":
+                repRelationSibling = "Yes_ltey"
+            case "parent":
+                repRelationParent = "Yes_ltey"
+            case "others":
+                repRelationOthers = "Yes_ltey"
+
+        # Reason
+        repReason_value = rep.get('reReason', '').lower()
+
+        if repReason_value == "others":
+            repOther = "Yes_xqqa"
+        else:
+            repIncapacitated = "Yes_xqqa"
+
+    date_admitted = [today.month, today.day, today.year]
+
     data_dict_csf = {
+        # -----------------------------
+        # Patient Name
+        # -----------------------------
+        form_fields_csf[form_fields_csf.index("lastName")]: data["lastName"].upper(),
+        form_fields_csf[form_fields_csf.index("firstName")]: data["firstName"].upper(),
+        form_fields_csf[form_fields_csf.index("nameExtension")]: data["nameExt"].upper(),
+        form_fields_csf[form_fields_csf.index("middleName")]: data["middleName"].upper(),
+
+        # -----------------------------
+        # Patient PIN (PhilHealth ID)
+        # -----------------------------
         form_fields_csf[form_fields_csf.index("pin0")]: patients_pin[0],
-        form_fields_csf[form_fields_csf.index("pin1")]: patients_pin[1], 
+        form_fields_csf[form_fields_csf.index("pin1")]: patients_pin[1],
         form_fields_csf[form_fields_csf.index("pin2")]: patients_pin[2],
-        form_fields_csf[0]: data['lastName'].upper(),
-        form_fields_csf[1]: data['firstName'].upper(),
-        form_fields_csf[2]: data['nameExt'].upper(),
-        form_fields_csf[3]: data['middleName'].upper(),
+
+        # -----------------------------
+        # Patient DOB
+        # -----------------------------
         form_fields_csf[form_fields_csf.index("dobMonth")]: birthDate[1],
         form_fields_csf[form_fields_csf.index("dobDay")]: birthDate[2],
         form_fields_csf[form_fields_csf.index("dobYear")]: birthDate[0],
 
-    }
+        # -----------------------------
+        # Dependent Name
+        # -----------------------------
+        form_fields_csf[form_fields_csf.index("dependentLastName")]: data['dependent']['depLname'].upper() if data['dependent']['depLname'] else "",
+        form_fields_csf[form_fields_csf.index("dependentFirstName")]: data['dependent']['depFname'].upper() if data['dependent']['depFname'] else "",
+        form_fields_csf[form_fields_csf.index("dependentNameExtension")]: data['dependent']['depExt'].upper() if data['dependent']['depExt'] else "",
+        form_fields_csf[form_fields_csf.index("dependentMiddleName")]: data['dependent']['depMname'].upper() if data['dependent']['depMname'] else "",
 
+        # # -----------------------------
+        # # Dependent PIN
+        # # -----------------------------
+        form_fields_csf[form_fields_csf.index("dependentPin0")]: dep_pin[0] if dep_pin else "",
+        form_fields_csf[form_fields_csf.index("dependentPin1")]: dep_pin[1] if dep_pin else "",
+        form_fields_csf[form_fields_csf.index("dependentPin2")]: dep_pin[2] if dep_pin else "",
+
+        form_fields_csf[form_fields_csf.index("patientDOBMonth")]: dep_bd[1] if dep_bd else "",
+        form_fields_csf[form_fields_csf.index("patientDOBDay")]: dep_bd[2] if dep_bd else "",
+        form_fields_csf[form_fields_csf.index("patientDOBYear")]: dep_bd[0] if dep_bd else "",
+
+        # # -----------------------------
+        # # Relationship Checkboxes
+        # # These will be filled later as ✔ or blank
+        # # -----------------------------
+        form_fields_csf[form_fields_csf.index("depRelationsipChild")]: depChild,
+        form_fields_csf[form_fields_csf.index("depRelationshipParent")]: depParent,
+        form_fields_csf[form_fields_csf.index("depRelationshipSpouse")]: depSpouse,
+
+
+        form_fields_csf[form_fields_csf.index("confineDateMonth")]: date_admitted[0],
+        form_fields_csf[form_fields_csf.index("confineDateDay")]: date_admitted[1],
+        form_fields_csf[form_fields_csf.index("confineDateYear")]: date_admitted[2],
+        # # -----------------------------
+        # # Representative Types / Signatures
+        # # -----------------------------
+        form_fields_csf[form_fields_csf.index("memberSignature")]: memberPrintedName,
+        form_fields_csf[form_fields_csf.index("isMemberSignature")]: signMember,
+
+        form_fields_csf[form_fields_csf.index("repSignature")]: repPrintedName,
+        form_fields_csf[form_fields_csf.index("repDateSignedMonth")]: repSignDate[0],
+        form_fields_csf[form_fields_csf.index("repDateSignedDay")]: repSignDate[1],
+        form_fields_csf[form_fields_csf.index("repDateSignedYear")]: repSignDate[2],
+        form_fields_csf[form_fields_csf.index("repChild")]: repRelationChild,
+        form_fields_csf[form_fields_csf.index("repParent")]: repRelationParent,
+        form_fields_csf[form_fields_csf.index("repSpouse")]: repRelationSpouse,
+        form_fields_csf[form_fields_csf.index("repSibling")]: repRelationSibling,
+        form_fields_csf[form_fields_csf.index("repOthers")]: repRelationOthers,
+        # form_fields_csf[form_fields_csf.index("ifPatient")]: "",
+        # form_fields_csf[form_fields_csf.index("ifRepresentative")]: "",
+
+        # # -----------------------------
+        # # Date Signed (Patient)
+        # # -----------------------------
+        form_fields_csf[form_fields_csf.index("dateSignedMonth")]: memberSignDate[0],
+        form_fields_csf[form_fields_csf.index("dateSignedDay")]: memberSignDate[1],
+        form_fields_csf[form_fields_csf.index("dateSignedYear")]: memberSignDate[2],
+
+        # # -----------------------------
+        # # Representative Date Signed
+        # # -----------------------------
+        form_fields_csf[form_fields_csf.index("repDateSignedMonth")]: repSignDate[0],
+        form_fields_csf[form_fields_csf.index("repDateSignedDay")]: repSignDate[1],
+        form_fields_csf[form_fields_csf.index("repDateSignedYear")]: repSignDate[2],
+
+        form_fields_csf[form_fields_csf.index("consentDateMonth")]: today.month,
+        form_fields_csf[form_fields_csf.index("consentDateDay")]: today.day,
+        form_fields_csf[form_fields_csf.index("consentDateYear")]: today.year,
+        form_fields_csf[form_fields_csf.index("repSpouse1")]: depSpouse,
+        form_fields_csf[form_fields_csf.index("repChild1")]: depChild,
+        form_fields_csf[form_fields_csf.index("repParent1")]: depParent,
+        form_fields_csf[form_fields_csf.index("repSibling1")]: repRelationSibling,
+        form_fields_csf[form_fields_csf.index("repOther1")]: repRelationOthers,
+
+        form_fields_csf[form_fields_csf.index("SignatureMemberRep")]: consentName, 
+        form_fields_csf[form_fields_csf.index("ifPatient")]: consentIsMemberSign,
+        form_fields_csf[form_fields_csf.index("ifRepresentative")]: consentIsRepresentativeSign,
+        
+        form_fields_csf[form_fields_csf.index("accreditationNo0")]: "1100",
+        form_fields_csf[form_fields_csf.index("accreditationNo1")]: "1945935",
+        form_fields_csf[form_fields_csf.index("accreditationNo2")]: "3",
+        form_fields_csf[form_fields_csf.index("healthCareSignature")]: doctor,
+        form_fields_csf[form_fields_csf.index("healthCareSignedMonth")]: today.month,
+        form_fields_csf[form_fields_csf.index("healthCareSignedDay")]: today.day,
+        form_fields_csf[form_fields_csf.index("healthCareSignedYear")]: today.year,
+
+        form_fields_csf[form_fields_csf.index("RVSCode")]: "P90375",
+        form_fields_csf[form_fields_csf.index("authHCI")]: doctor,
+        form_fields_csf[form_fields_csf.index("Designation")]: "PHYSICIAN",
+        form_fields_csf[form_fields_csf.index("providerSignedMonth")]: today.month,
+        form_fields_csf[form_fields_csf.index("providerSignedDay")]: today.day,
+        form_fields_csf[form_fields_csf.index("providerSignedYear")]: today.year,       
+        
+    }
+  
     fillpdfs.write_fillable_pdf(pdf_path, output_pdf, data_dict_csf)
-    
+    #flatten_pdf(output_pdf, output_pdf)
+
 def fill_soa(data):
     
     output_pdf = 'output_soa.pdf'
     pdf_path = "template_soa.pdf"
 
     form_fields_soa = list(fillpdfs.get_form_fields(pdf_path).keys())
-    print(form_fields_soa)
 
     # Get the current date and time
     now = datetime.now()
@@ -301,9 +492,10 @@ def fill_soa(data):
     }
 
     fillpdfs.write_fillable_pdf(pdf_path, output_pdf, data_dict_soa)
-
+    flatten_pdf(output_pdf, output_pdf)
 
 def merge_pdfs(pdf_list, output_pdf):
+    from PyPDF2 import PdfMerger
     merger = PdfMerger()
     for pdf in pdf_list:
         merger.append(pdf)
@@ -311,26 +503,26 @@ def merge_pdfs(pdf_list, output_pdf):
     merger.close()
     print(f"Merged PDF saved as {output_pdf}")
 
-def pdf_to_image_pdf(input_pdf, output_pdf):
+# def pdf_to_image_pdf(input_pdf, output_pdf):
     # Convert PDF pages to images
-    pages = convert_from_path(input_pdf)
+    # pages = convert_from_path(input_pdf)
+    # image_files = []
+    # for i, page in enumerate(pages):
+    #     img_path = f"temp_page_{i}.png"
+    #     page.save(img_path, "PNG")
+    #     image_files.append(img_path)
 
-    image_files = []
-    for i, page in enumerate(pages):
-        img_path = f"temp_page_{i}.png"
-        page.save(img_path, "PNG")
-        image_files.append(img_path)
+    # # Merge images into PDF
+    # with open(output_pdf, "wb") as f:
+    #     f.write(img2pdf.convert(image_files))
 
-    # Convert images back to PDF
-    with open(output_pdf, "wb") as f:
-        f.write(img2pdf.convert(image_files))
+    # # Clean temp images
+    # for img in image_files:
+    #     if os.path.exists(img):
+    #         os.remove(img)
 
-    # Optional: delete temp images
-    for img_file in image_files:
-        Path(img_file).unlink()
-
-    print(f"Converted {input_pdf} → {output_pdf}")
-    return image_files
+    # print(f"Converted {input_pdf} → {output_pdf}")
+    # return output_pdf
 
 def clean_files(file_list):
     for f in file_list:
@@ -340,6 +532,10 @@ def clean_files(file_list):
                 print(f"Deleted {f}")
         except Exception as e:
             print(f"Error deleting {f}: {e}")
+
+@app.route("/view_print")
+def view_print_pdf():
+    return render_template('viewPrintPDF.html')
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=True)
