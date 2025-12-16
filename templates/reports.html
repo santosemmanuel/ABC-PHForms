@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Dynamic MHO Claims Analytics</title>
+        <!-- BOOTSTRAP CDN (Assuming local link is inaccessible for this new file) -->
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+              rel="stylesheet"
+              xintegrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH"
+              crossorigin="anonymous">
+        <!-- FONT AWESOME FOR ICONS -->
+        <link rel="stylesheet"
+              href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
+              xintegrity="sha512-SnH5WK+bZxgPHs44uWIX+LLMDJ8gHPL7Jj951z9gEN1eW5b5F2kXWkO7q58H+S3F1z5O9G/7m3v5T3M5v5+5w=="
+              crossorigin="anonymous"
+              referrerpolicy="no-referrer" />
+        <!-- Google Fonts: Inter -->
+        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap"
+              rel="stylesheet">
+        <!-- CHART.JS for Data Visualization -->
+        <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
+        <style>
+        :root {
+            --color-primary-green: #28a745; 
+            --color-dark-green: #1e7e34;
+            --color-text-dark: #343a40;
+            --color-bg-light: #f8f9fa;
+        }
+
+        body {
+            background: var(--color-bg-light);
+            font-family: 'Inter', sans-serif;
+            color: var(--color-text-dark);
+        }
+        
+        /* Modern Container */
+        .modern-container {
+            max-width: 1300px;
+            margin: auto;
+            padding-top: 20px;
+            padding-bottom: 20px;
+        }
+        
+        /* --- UNIFIED HEADER STYLE --- */
+        .app-header {
+            background: linear-gradient(to right, var(--color-primary-green), #4CAF50);
+            color: white;
+            padding: 15px 30px;
+            border-radius: 12px;
+            margin-bottom: 25px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .app-header h1 {
+            font-size: 1.6rem;
+            font-weight: 700;
+            margin-bottom: 0;
+        }
+        .app-header .subtitle {
+            font-size: 0.95rem;
+            opacity: 0.9;
+            margin-top: 5px;
+        }
+        .mho-logo {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            object-fit: cover;
+            margin-right: 15px;
+        }
+        .app-header .header-icon-right {
+            font-size: 2rem;
+            color: rgba(255, 255, 255, 0.8);
+        }
+        
+        /* --- Dashboard Specific Styles --- */
+        .stat-card, .chart-card, .table-card {
+            background-color: white;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        }
+        .stat-card {
+            transition: transform 0.2s;
+            min-height: 120px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+        .stat-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+        .stat-card .value {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--color-primary-green);
+        }
+        
+        .btn-return {
+            background-color: #007bff;
+            border-color: #007bff;
+            border-radius: 8px;
+            font-weight: 500;
+            color: white;
+        }
+        .btn-return:hover {
+            background-color: #0056b3;
+            border-color: #0056b3;
+            color: white;
+        }
+        .control-panel {
+            background-color: #f0f3f6;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 25px;
+        }
+        .table-responsive {
+            border-radius: 12px;
+            overflow: hidden;
+        }
+        </style>
+    </head>
+    <body>
+        <div class="container modern-container">
+            <!-- ======== UNIFIED HEADER IMPLEMENTATION ======== -->
+            <div class="app-header">
+                <div class="d-flex align-items-center">
+                    <img src="https://i.imgur.com/G8f0v3e.png"
+                         alt="MHO Burauen Logo Placeholder"
+                         class="mho-logo" />
+                    <div>
+                        <h1 class="mb-0">MHO Burauen Animal Bite Treatment Center</h1>
+                        <div class="subtitle">Dynamic Claims Data Analytics and Reports</div>
+                    </div>
+                </div>
+                <div class="d-flex align-items-center">
+                    <button class="btn btn-return me-3" onclick="window.location.href = '/'">
+                        <i class="fa-solid fa-home me-1"></i> Go to Index
+                    </button>
+                    <i class="fa-solid fa-chart-area header-icon-right"></i>
+                </div>
+            </div>
+            <!-- ======== END UNIFIED HEADER ======== -->
+            <main>
+                <!-- Data Overview Cards -->
+                <h2 class="h5 mb-3 text-secondary">Key Performance Indicators</h2>
+                <div class="row g-4 mb-5" id="kpiCards">
+                    <div class="col-md-3">
+                        <div class="stat-card bg-white">
+                            <div class="text-secondary fw-semibold">Total Claims</div>
+                            <div class="value" id="totalClaims">0</div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="stat-card bg-white">
+                            <div class="text-secondary fw-semibold">Dependent Claims</div>
+                            <div class="value text-warning" id="dependentClaims">0</div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="stat-card bg-white">
+                            <div class="text-secondary fw-semibold">Avg. Age of Patients</div>
+                            <div class="value text-danger" id="avgAge">0</div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="stat-card bg-white">
+                            <div class="text-secondary fw-semibold">Patients Discharged</div>
+                            <div class="value text-info" id="dischargedCount">0</div>
+                        </div>
+                    </div>
+                </div>
+                <!-- Dynamic Chart and Table Control Panel -->
+                <div class="control-panel d-flex flex-wrap align-items-center justify-content-start gap-4">
+                    <div class="d-flex align-items-center gap-2">
+                        <label for="dataTypeSelector" class="fw-bold text-dark">Data Dimension:</label>
+                        <select id="dataTypeSelector"
+                                class="form-select w-auto"
+                                onchange="renderDynamicVisualization()">
+                            <option value="sex">Patient Sex</option>
+                            <option value="signee">Signee Type</option>
+                            <option value="relationship">Relationship to Member</option>
+                            <option value="disposition">Patient Disposition</option>
+                        </select>
+                    </div>
+                    <div class="d-flex align-items-center gap-2">
+                        <label for="chartTypeSelector" class="fw-bold text-dark">Visualization Type:</label>
+                        <select id="chartTypeSelector"
+                                class="form-select w-auto"
+                                onchange="renderDynamicVisualization()">
+                            <option value="bar">Bar Chart</option>
+                            <option value="pie">Pie Chart</option>
+                            <option value="line" disabled>Line Chart (Requires Time Data)</option>
+                            <option value="table">Data Table</option>
+                        </select>
+                    </div>
+                </div>
+                <!-- Dynamic Visualization Area -->
+                <div class="chart-card mb-5">
+                    <h6 class="mb-3 fw-bold" id="visualizationTitle">Data Visualization</h6>
+                    <!-- Chart Area (for Bar, Pie, Line) -->
+                    <div id="chartContainer" style="display: block;">
+                        <canvas id="dynamicChart" height="400"></canvas>
+                    </div>
+                    <!-- Table Area (for Table view) -->
+                    <div id="tableContainer" class="table-responsive" style="display: none;">
+                        <table class="table table-hover mb-0" id="dynamicTable">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>#</th>
+                                    <th>Patient Name</th>
+                                    <th>Category</th>
+                                    <th>Disposition</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <!-- Dynamic data rows here -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </main>
+        </div>
+        <script>
+        // --- SIMULATED DATA (Based on Index Form structure) ---
+        // **IMPORTANT**: Replace this array with a dynamic data fetch from your backend in a real app.
+        const MHOFormData = [
+            { pin: '00-0000000-1', lastName: 'DELA CRUZ', firstName: 'JUAN', dob: '1985-06-15', sex: 'M', patientIsMember: 'yes', signee: 'member', patientDisposition: 'DISCHARGED' },
+            { pin: '00-0000000-2', lastName: 'REYES', firstName: 'MARIA', dob: '1990-11-20', sex: 'F', patientIsMember: 'no', dependent: { relationship: 'SPOUSE', depLname: 'GARCIA', depFname: 'PEDRO', depDob: '1970-01-01' }, signee: 'representative', patientDisposition: 'HOSPITALIZED' },
+            { pin: '00-0000000-3', lastName: 'SANTOS', firstName: 'CARLO', dob: '2005-02-01', sex: 'M', patientIsMember: 'yes', signee: 'member', patientDisposition: 'DISCHARGED' },
+            { pin: '00-0000000-4', lastName: 'LOPEZ', firstName: 'JESSA', dob: '2018-09-10', sex: 'F', patientIsMember: 'no', dependent: { relationship: 'CHILD', depLname: 'LOPEZ', depFname: 'MICHAEL', depDob: '1995-03-25' }, signee: 'representative', patientDisposition: 'DISCHARGED' },
+            { pin: '00-0000000-5', lastName: 'GOMEZ', firstName: 'ANNA', dob: '1975-12-25', sex: 'F', patientIsMember: 'yes', signee: 'member', patientDisposition: 'DISCHARGED' },
+            { pin: '00-0000000-6', lastName: 'CRUZ', firstName: 'DAVID', dob: '2010-07-07', sex: 'M', patientIsMember: 'no', dependent: { relationship: 'CHILD', depLname: 'CRUZ', depFname: 'ELENA', depDob: '1980-08-12' }, signee: 'representative', patientDisposition: 'DIED' },
+            { pin: '00-0000000-7', lastName: 'FERNANDEZ', firstName: 'NINA', dob: '1998-04-04', sex: 'F', patientIsMember: 'yes', signee: 'member', patientDisposition: 'HOSPITALIZED' },
+            { pin: '00-0000000-8', lastName: 'RIVERA', firstName: 'BEN', dob: '1965-01-01', sex: 'M', patientIsMember: 'no', dependent: { relationship: 'SPOUSE', depLname: 'RIVERA', depFname: 'CARMEN', depDob: '1970-02-02' }, signee: 'representative', patientDisposition: 'DISCHARGED' },
+            { pin: '00-0000000-9', lastName: 'LIM', firstName: 'CHLOE', dob: '1993-10-10', sex: 'F', patientIsMember: 'yes', signee: 'member', patientDisposition: 'DISCHARGED' },
+            { pin: '00-0000001-0', lastName: 'TAN', firstName: 'ROBERT', dob: '1982-03-03', sex: 'M', patientIsMember: 'yes', signee: 'member', patientDisposition: 'TRANSFERRED' },
+            { pin: '00-0000001-1', lastName: 'ALONZO', firstName: 'LIZA', dob: '1996-05-20', sex: 'F', patientIsMember: 'yes', signee: 'member', patientDisposition: 'DISCHARGED' },
+            { pin: '00-0000001-2', lastName: 'BERNARDO', firstName: 'GAB', dob: '2020-01-01', sex: 'M', patientIsMember: 'no', dependent: { relationship: 'CHILD', depLname: 'BERNARDO', depFname: 'JULIA', depDob: '1990-10-10' }, signee: 'representative', patientDisposition: 'DISCHARGED' },
+        ];
+        
+        // Global chart instance
+        let dynamicChartInstance = null;
+        
+        // --- HELPER FUNCTIONS ---
+        function calculateAge(dob) {
+            if (!dob) return null;
+            const birthDate = new Date(dob);
+            const today = new Date();
+            let age = today.getFullYear() - birthDate.getFullYear();
+            const m = today.getMonth() - birthDate.getMonth();
+            if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
+                age--;
+            }
+            return age;
+        }
+
+        // --- DATA AGGREGATION ---
+        function getAggregatedData(claims, dimension) {
+            const aggregation = {};
+            const displayName = {
+                sex: 'Patient Sex Distribution',
+                signee: 'Signee Type Distribution',
+                relationship: 'Relationship to Member',
+                disposition: 'Patient Disposition Status'
+            };
+
+            claims.forEach(claim => {
+                let key = 'N/A';
+
+                switch (dimension) {
+                    case 'sex':
+                        key = claim.sex || 'N/A';
+                        break;
+                    case 'signee':
+                        key = claim.signee || 'N/A';
+                        break;
+                    case 'disposition':
+                        key = claim.patientDisposition || 'N/A';
+                        break;
+                    case 'relationship':
+                        // Use Member for self and relationship for dependent
+                        key = claim.patientIsMember === 'yes' ? 'Member (Self)' : (claim.dependent?.relationship || 'N/A');
+                        break;
+                }
+
+                aggregation[key] = (aggregation[key] || 0) + 1;
+            });
+
+            return {
+                title: displayName[dimension],
+                labels: Object.keys(aggregation).filter(k => k !== 'N/A').sort(),
+                counts: Object.values(aggregation).filter((_, i) => Object.keys(aggregation).filter(k => k !== 'N/A').sort().includes(Object.keys(aggregation)[i])),
+                rawAggregation: aggregation,
+            };
+        }
+
+        // --- KPI CALCULATIONS ---
+        function calculateKPIs(claims) {
+            const stats = {
+                totalClaims: claims.length,
+                dependentClaims: claims.filter(c => c.patientIsMember === 'no').length,
+                totalAge: 0,
+                dischargedCount: claims.filter(c => c.patientDisposition === 'DISCHARGED').length,
+            };
+
+            let patientCount = 0;
+            claims.forEach(claim => {
+                const dob = claim.patientIsMember === 'yes' ? claim.dob : (claim.dependent?.depDob);
+                const age = calculateAge(dob);
+                if (age !== null) {
+                    stats.totalAge += age;
+                    patientCount++;
+                }
+            });
+
+            stats.avgAge = patientCount > 0 ? (stats.totalAge / patientCount).toFixed(1) : 0;
+            return stats;
+        }
+
+        // --- VISUALIZATION RENDERING ---
+
+        function getChartColors(count) {
+            const baseColors = [
+                '#28a745', '#007bff', '#ffc107', '#dc3545', '#17a2b8', '#6f42c1', '#fd7e14', '#20c997'
+            ];
+            // Repeat colors if needed, or get a slice
+            return Array.from({ length: count }, (_, i) => baseColors[i % baseColors.length]);
+        }
+
+        function renderDynamicChart(data, type) {
+            const ctx = document.getElementById('dynamicChart').getContext('2d');
+            const colors = getChartColors(data.labels.length);
+
+            // Destroy previous chart instance if it exists
+            if (dynamicChartInstance) {
+                dynamicChartInstance.destroy();
+            }
+            
+            // Configuration is similar for bar, pie, and doughnut
+            const chartConfig = {
+                type: type === 'pie' ? 'pie' : type === 'doughnut' ? 'doughnut' : 'bar',
+                data: {
+                    labels: data.labels,
+                    datasets: [{
+                        label: data.title,
+                        data: data.counts,
+                        backgroundColor: colors,
+                        borderColor: '#fff',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { position: 'top' },
+                        title: { display: false }
+                    },
+                    scales: (type === 'bar' || type === 'line') ? {
+                        y: { beginAtZero: true, title: { display: true, text: 'Count' } }
+                    } : {}
+                }
+            };
+            
+            dynamicChartInstance = new Chart(ctx, chartConfig);
+        }
+        
+        function renderDynamicTable(data) {
+            const tbody = document.getElementById('dynamicTable').getElementsByTagName('tbody')[0];
+            tbody.innerHTML = ''; // Clear existing rows
+            
+            MHOFormData.forEach((claim, index) => {
+                const isMember = claim.patientIsMember === 'yes';
+                const patientName = isMember 
+                    ? `${claim.lastName}, ${claim.firstName}` 
+                    : `${claim.dependent.depLname || claim.lastName}, ${claim.dependent.depFname || claim.firstName}`;
+                
+                const category = data.rawAggregation[
+                    document.getElementById('dataTypeSelector').value === 'relationship' 
+                    ? (isMember ? 'Member (Self)' : claim.dependent?.relationship) 
+                    : claim[document.getElementById('dataTypeSelector').value]
+                ];
+                
+                const row = tbody.insertRow();
+                row.innerHTML = `
+                    <td>${index + 1}</td>
+                    <td>${patientName}</td>
+                    <td>${category || 'N/A'}</td>
+                    <td>${claim.patientDisposition || 'N/A'}</td>
+                `;
+            });
+        }
+        
+        function renderDynamicVisualization() {
+            const chartType = document.getElementById('chartTypeSelector').value;
+            const dataType = document.getElementById('dataTypeSelector').value;
+            const data = getAggregatedData(MHOFormData, dataType);
+            const title = `${data.title} (${chartType.charAt(0).toUpperCase() + chartType.slice(1)} View)`;
+            
+            document.getElementById('visualizationTitle').textContent = title;
+            
+            const chartContainer = document.getElementById('chartContainer');
+            const tableContainer = document.getElementById('tableContainer');
+            
+            // Switch between chart and table view
+            if (chartType === 'table') {
+                chartContainer.style.display = 'none';
+                tableContainer.style.display = 'block';
+                renderDynamicTable(data);
+            } else {
+                chartContainer.style.display = 'block';
+                tableContainer.style.display = 'none';
+                renderDynamicChart(data, chartType);
+            }
+        }
+
+        // --- INITIALIZATION ---
+        window.onload = function() {
+            // 1. Calculate and Render KPIs
+            const stats = calculateKPIs(MHOFormData);
+            document.getElementById('totalClaims').textContent = stats.totalClaims;
+            document.getElementById('dependentClaims').textContent = stats.dependentClaims;
+            document.getElementById('avgAge').textContent = stats.avgAge;
+            document.getElementById('dischargedCount').textContent = stats.dischargedCount;
+            
+            // 2. Initial Visualization Render
+            renderDynamicVisualization();
+        };
+
+        </script>
+        <!-- Bootstrap JS -->
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+                xintegrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
+                crossorigin="anonymous"></script>
+    </body>
+</html>

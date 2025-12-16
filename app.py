@@ -1,8 +1,8 @@
-from flask import Flask, render_template, request, jsonify
+from flask import Flask, render_template, request, jsonify, current_app
 from fillpdf import fillpdfs
 from pdfrw import PdfReader as PdfRwReader, PdfWriter as PdfRwWriter, PageMerge, PdfDict, PdfName
 from datetime import datetime, date
-from pdf2image import convert_from_path
+# from pdf2image import convert_from_path
 # import img2pdf
 import os
 import json
@@ -62,26 +62,58 @@ def submit_form():
 
     fill_cf1(patient_data)
     fill_csf(patient_data)
+    fill_cf2(patient_data)
     fill_soa(patient_data)
     # Debug: see the data received
     # TODO: Save to database or process
    
     # Merge all flattened PDFs
-    merge_pdfs(["output_cf1.pdf", "output_csf.pdf", "output_soa.pdf"], "final_merged.pdf")
+    # merge_pdfs(["output_cf1.pdf", "output_csf.pdf", "output_soa.pdf"], "final_merged.pdf")
 
     # Optional: delete individual PDFs
     #clean_files(["output_cf1.pdf", "output_csf.pdf", "output_soa.pdf"])
 
     return jsonify({"status": "success", "message": "Form received"})
 
+def split_pin(pin_str):
+    """
+    Splits a PhilHealth PIN string into:
+    - first two digits
+    - middle digits
+    - last digit
+    
+    Example:
+        '123456789012' → ('12', '345678901', '2')
+    """
+    pin_str = str(pin_str).strip()
+
+    if len(pin_str) != 12:
+        raise ValueError("PIN must be at least 3 digits.")
+
+    first_two = pin_str[:2]
+    last_digit = pin_str[-1]
+    middle = pin_str[2:-1]
+
+    return [first_two, middle, last_digit]
+
 def fill_cf1(data):
 
-    output_pdf = 'output_cf1.pdf'
-    pdf_path = "template_cf1.pdf"
+    pdf_path = os.path.join(current_app.root_path,"template_cf1.pdf")
+    output_pdf = os.path.join(current_app.root_path, "static", "pdfs", "output_cf1.pdf")
 
     try:
         form_fields_cf1 = list(fillpdfs.get_form_fields(pdf_path).keys())
-        patients_pin = data['pin'].split('-')
+        patients_pin = split_pin(data['pin'])
+        # new_pin = '\t\t\t'.join(patients_pin[1])
+        new_pin = " "
+        i = 2
+        for letter in patients_pin[1]:
+            if i % 2 == 0:
+                new_pin += letter + "  "
+            else:
+                new_pin += letter + "   "
+            i += 1
+        print(new_pin)
         birthDate = data['dob'].split('-')
 
         memberMale = "Yes_xqqa" if data['sex'].lower() == "male" else None
@@ -100,7 +132,7 @@ def fill_cf1(data):
 
             # Safe PIN
             depPin_value = dep.get('depPin')
-            depPin = depPin_value.split('-') if depPin_value else ["", "", ""]
+            depPin = split_pin(depPin_value) if depPin_value else ["", "", ""]
 
             depLname = dep.get('depLname')
             depFname = dep.get('depFname')
@@ -170,7 +202,7 @@ def fill_cf1(data):
 
         data_dict = {
             form_fields_cf1[form_fields_cf1.index("pin0")]: patients_pin[0],
-            form_fields_cf1[form_fields_cf1.index("pin1")]: patients_pin[1],
+            form_fields_cf1[form_fields_cf1.index("pin1")]: new_pin,
             form_fields_cf1[form_fields_cf1.index("pin2")]: patients_pin[2],
             form_fields_cf1[form_fields_cf1.index("lastName")]: data['lastName'].upper(),
             form_fields_cf1[form_fields_cf1.index("firstName")]: data['firstName'].upper(),
@@ -234,22 +266,173 @@ def fill_cf1(data):
 
     
         fillpdfs.write_fillable_pdf(pdf_path, output_pdf, data_dict)
-        fillpdfs.flatten_pdf(output_pdf, output_pdf, as_images=True)
+        # fillpdfs.flatten_pdf(output_pdf, output_pdf, as_images=True)
     except Exception as e:
         print(f"This is the error {e}")
 
-def fill_cf2():
-    pass
+def fill_cf2(data):
+
+    try:
+        pdf_path = os.path.join(current_app.root_path,"template_cf2.pdf")
+        output_pdf = os.path.join(current_app.root_path, "static", "pdfs", "output_cf2.pdf")
+
+        form_fields_cf2 = list(fillpdfs.get_form_fields(pdf_path).keys())
+        print(form_fields_cf2)
+
+        PAN = "E08039067"
+        HCIName = "BURAUEN MUNICIPAL HEALTH OFFICE ANIMAL BITE TREATMENT CENTER"
+        HCIAddress = "LGU COMPOUND, DISTRICT 7"
+        HCIMunicipality = "BURAUEN"
+        HCIProvince = "LEYTE"
+        ICD10Code = "T14.1\nW55"
+        RelatedProcedures = "ANIMAL BITE\nTREATMENT"
+        RVSCode = "P90375"
+        Doctor = "MA. QUEENA JOVE Q. SERRANO MD"
+        Designation = "PHYSICIAN"
+        GrandTotal = "P 5,850.00"
+        AccreditationNo = ["1100", "1945935","3"]
+
+        date_admitted = [today.month, today.day, today.year]
+        date_signed = [today.month, today.day, today.year]
+
+        patientFname = data["firstName"].upper()
+        patientMname = data["middleName"].upper()
+        patientLname = data["lastName"].upper()
+        patientExt = data["nameExt"].upper()
+
+        if data["patientIsMember"] == "no":
+            patientFname = data["dependent"]["depFname"]
+            patientMname = data["dependent"]["depMname"]
+            patientLname = data["dependent"]["depLname"]
+            patientExt = data["dependent"]["depExt"]
+
+        dispositionImprove = dispositionRecovered = dispositionHomeDischarged = dispositionAbsconded = dispositionExpired = dispositionTransferred = ""
+
+        match (data["patientDisposition"]):
+            case "Improved":
+                dispositionImprove = "Yes_vzps"
+            case "Recovered":
+                dispositionRecovered = "Yes_vzps"
+            case "HomeDischarged":
+                dispositionHomeDischarged = "Yes_vzps"
+            case "Absconded":
+                dispositionAbsconded = "Yes_vzps"
+            case "Expired":
+                dispositionExpired = "Yes_vzps"
+            case "Transferred":
+                dispositionTransferred = "Yes_vzps"
+
+        memberMiddleI = data.get('middleName', '')
+        consentFormName = f"{data.get('firstName', '').upper()} {memberMiddleI[0].upper() + '.' if memberMiddleI else ''} {data.get('lastName', '').upper()} {data.get('nameExt', '')}".strip()
+        repRelationChild = repRelationSpouse = repRelationSibling = repRelationParent = repRelationOthers = repOther = repIncapcitated = ""
+
+        if data.get('signee', '').lower() == "representative":
+            consentFormName = data["representative"]["repName"]
+
+            repRel_value = data["representative"]["repRelationship"]
+            match repRel_value.lower():
+                case "spouse":
+                    repRelationSpouse = "Yes_cdvw"
+                case "child":
+                    repRelationChild = "Yes_cdvw"
+                case "sibling":
+                    repRelationSibling = "Yes_cdvw"
+                case "parent":
+                    repRelationParent = "Yes_cdvw"
+                case "others":
+                    repRelationOthers = "Yes_cdvw"
+            repReason = data["representative"]["repReason"].lower()
+
+            if repReason == "others":
+                repOther = "Yes_cdvw"
+            else:
+                repIncapcitated = "Yes_cdvw"
+                    
+        data_dict_cf2 = {
+            form_fields_cf2[form_fields_cf2.index("checkbox_12ekrw")]: "",
+            form_fields_cf2[form_fields_cf2.index("PAN")]: PAN,
+            form_fields_cf2[form_fields_cf2.index("HCIName")]: HCIName,
+            form_fields_cf2[form_fields_cf2.index("HCIAddress")]: HCIAddress,
+            form_fields_cf2[form_fields_cf2.index("HCIMunicipality")]: HCIMunicipality,
+            form_fields_cf2[form_fields_cf2.index("HCIProvince")]: HCIProvince,
+
+            form_fields_cf2[form_fields_cf2.index("PatientLName")]: patientLname,
+            form_fields_cf2[form_fields_cf2.index("PatientFName")]: patientFname,
+            form_fields_cf2[form_fields_cf2.index("PatientExt")]: patientExt,
+            form_fields_cf2[form_fields_cf2.index("PatientMName")]: patientMname,
+
+            form_fields_cf2[form_fields_cf2.index("isRefferedHCINO")]: "Yes_vzps",
+
+            form_fields_cf2[form_fields_cf2.index("DateAdmittedMonth")]: date_admitted[0],
+            form_fields_cf2[form_fields_cf2.index("DateAdmittedDay")]: date_admitted[1],
+            form_fields_cf2[form_fields_cf2.index("DateAdmittedYear")]: date_admitted[2],
+
+            form_fields_cf2[form_fields_cf2.index("DispositionImproved")]: dispositionImprove,
+            form_fields_cf2[form_fields_cf2.index("DispositionExpired")]: dispositionExpired,
+            form_fields_cf2[form_fields_cf2.index("DispositionRecovered")]: dispositionRecovered,
+            form_fields_cf2[form_fields_cf2.index("DispositionTransferred")]: dispositionTransferred,
+            form_fields_cf2[form_fields_cf2.index("DispositionHome")]: dispositionHomeDischarged,
+            form_fields_cf2[form_fields_cf2.index("DispositionAbsconded")]: dispositionAbsconded,
+
+            form_fields_cf2[form_fields_cf2.index("AccomodationNonPrivate")]: "Yes_vzps",
+
+            form_fields_cf2[form_fields_cf2.index("Admission Diagnosis")]: "ANIMAL BITE TREATMENT",
+            form_fields_cf2[form_fields_cf2.index("ICD10")]: ICD10Code,
+            form_fields_cf2[form_fields_cf2.index("RelatedProcedure")]: RelatedProcedures,
+
+            form_fields_cf2[form_fields_cf2.index("RVSCode1")]: RVSCode,
+            form_fields_cf2[form_fields_cf2.index("DateProcedure")]: f"{date_admitted[0]}-{date_admitted[1]}-{date_admitted[2]}",
+            form_fields_cf2[form_fields_cf2.index("Day0ARV")]: f"{date_admitted[0]}-{date_admitted[1]}-{date_admitted[2]}",
+            form_fields_cf2[form_fields_cf2.index("RVSCode2")]: RVSCode,
+            form_fields_cf2[form_fields_cf2.index("text_43ecxb")]: consentFormName,
+
+            form_fields_cf2[form_fields_cf2.index("AccreditationNo0")]: AccreditationNo[0],
+            form_fields_cf2[form_fields_cf2.index("AccreditationNo1")]: AccreditationNo[1],
+            form_fields_cf2[form_fields_cf2.index("AccreditationNo2")]: AccreditationNo[2],
+            form_fields_cf2[form_fields_cf2.index("AccreditationProfessional")]: Doctor,
+            form_fields_cf2[form_fields_cf2.index("NoCoCopy")]: "Yes_vzps",
+
+            form_fields_cf2[form_fields_cf2.index("AccreditationSignedMonth")]: date_signed[0],
+            form_fields_cf2[form_fields_cf2.index("AccreditationSignedDay")]: date_signed[1],
+            form_fields_cf2[form_fields_cf2.index("AccreditationSignedYear")]: date_signed[2],
+
+            form_fields_cf2[form_fields_cf2.index("ConsumptionBenefit1")]: "Yes_vzps",
+            form_fields_cf2[form_fields_cf2.index("GrandTotal")]: GrandTotal,
+
+            form_fields_cf2[form_fields_cf2.index("MemberDateSignMonth")]: date_signed[0],
+            form_fields_cf2[form_fields_cf2.index("MemberDateSignDay")]: date_signed[1],
+            form_fields_cf2[form_fields_cf2.index("MemberDateSignYear")]: date_signed[2],
+
+            form_fields_cf2[form_fields_cf2.index("RelationshipSpouse")]: repRelationSpouse,
+            form_fields_cf2[form_fields_cf2.index("RelationshipChild")]: repRelationChild,
+            form_fields_cf2[form_fields_cf2.index("RelationshipParent")]: repRelationParent,
+            form_fields_cf2[form_fields_cf2.index("RelationshipSibling")]: repRelationSibling,
+            form_fields_cf2[form_fields_cf2.index("RelationshipOthers")]: repRelationOthers,
+
+            form_fields_cf2[form_fields_cf2.index("ReasonIncapacitated")]: repIncapcitated,
+            form_fields_cf2[form_fields_cf2.index("ReasonOthers")]: repOther,
+
+            form_fields_cf2[form_fields_cf2.index("AuthorizedHCISign")]: Doctor,
+            form_fields_cf2[form_fields_cf2.index("Designation")]: Designation,
+
+            form_fields_cf2[form_fields_cf2.index("AuthorizedSignMonth")]: date_signed[0],
+            form_fields_cf2[form_fields_cf2.index("AuthorizedSignDay")]: date_signed[1],
+            form_fields_cf2[form_fields_cf2.index("AuthorizedSignYear")]: date_signed[2],
+        }
+
+        fillpdfs.write_fillable_pdf(pdf_path, output_pdf, data_dict_cf2)
+    except Exception as e:
+        print(f"This is the error {e}")
 
 def fill_csf(data):
 
-    output_pdf = 'output_csf.pdf'
-    pdf_path = "template_csf.pdf"
+    pdf_path = os.path.join(current_app.root_path,"template_csf.pdf")
+    output_pdf = os.path.join(current_app.root_path, "static", "pdfs", "output_csf.pdf")
 
     form_fields_csf = list(fillpdfs.get_form_fields(pdf_path).keys())
-    print(form_fields_csf)
+    #print(form_fields_csf)
 
-    patients_pin = data['pin'].split('-')
+    patients_pin = split_pin(data['pin'])
     birthDate = data['dob'].split('-')
 
     doctor = "MA. QUEENA JOVE Q. SERRANO MD"
@@ -259,12 +442,19 @@ def fill_csf(data):
 
     dep_pin = ["","",""]
     dep_bd = ["","",""]
-    depChild = depParent = depSpouse = ""
+    depChild = depParent = depSpouse = depLname = depFname = depExt = depMname = ""
+    
     if data["dependent"]:
-        dep_pin = data["dependent"]["depPin"].split("-")
+        dep_pin = split_pin(data["dependent"]["depPin"])
         dep_bd = data["dependent"]["depDob"].split("-")
 
         relationship_value = data["dependent"]["relationship"].lower()
+        
+        depLname = data['dependent']['depLname'].upper()
+        depFname = data['dependent']['depFname'].upper()
+        depExt = data['dependent']['depExt'].upper()
+        depMname = data['dependent']['depMname'].upper()
+
 
         match relationship_value:
             case "child":
@@ -283,7 +473,7 @@ def fill_csf(data):
     repSignDate = ["", "", ""]
     consentName = memberPrintedName
     consentIsRepresentativeSign = ""
-    consentIsMemberSign = ""
+    consentIsMemberSign = "Yes_ltey"
 
     if data.get('signee','').lower() == "member" and data.get('patientIsMember','') == "yes":
         consentIsMemberSign = "Yes_ltey"
@@ -294,6 +484,7 @@ def fill_csf(data):
         signMember = None
         memberPrintedName = ""
         memberSignDate = ["", "", ""]
+        consentIsMemberSign = ""
 
         rep = data.get('representative', {})
         repPrintedName = rep.get('repName')
@@ -351,10 +542,10 @@ def fill_csf(data):
         # -----------------------------
         # Dependent Name
         # -----------------------------
-        form_fields_csf[form_fields_csf.index("dependentLastName")]: data['dependent']['depLname'].upper() if data['dependent']['depLname'] else "",
-        form_fields_csf[form_fields_csf.index("dependentFirstName")]: data['dependent']['depFname'].upper() if data['dependent']['depFname'] else "",
-        form_fields_csf[form_fields_csf.index("dependentNameExtension")]: data['dependent']['depExt'].upper() if data['dependent']['depExt'] else "",
-        form_fields_csf[form_fields_csf.index("dependentMiddleName")]: data['dependent']['depMname'].upper() if data['dependent']['depMname'] else "",
+        form_fields_csf[form_fields_csf.index("dependentLastName")]: depLname,
+        form_fields_csf[form_fields_csf.index("dependentFirstName")]: depFname,
+        form_fields_csf[form_fields_csf.index("dependentNameExtension")]: depExt,
+        form_fields_csf[form_fields_csf.index("dependentMiddleName")]: depMname,
 
         # # -----------------------------
         # # Dependent PIN
@@ -446,8 +637,8 @@ def fill_csf(data):
 
 def fill_soa(data):
     
-    output_pdf = 'output_soa.pdf'
-    pdf_path = "template_soa.pdf"
+    pdf_path = os.path.join(current_app.root_path,"template_soa.pdf")
+    output_pdf = os.path.join(current_app.root_path, "static", "pdfs", "output_soa.pdf")
 
     form_fields_soa = list(fillpdfs.get_form_fields(pdf_path).keys())
 
@@ -492,7 +683,7 @@ def fill_soa(data):
     }
 
     fillpdfs.write_fillable_pdf(pdf_path, output_pdf, data_dict_soa)
-    flatten_pdf(output_pdf, output_pdf)
+    # flatten_pdf(output_pdf, output_pdf)
 
 def merge_pdfs(pdf_list, output_pdf):
     from PyPDF2 import PdfMerger
@@ -535,7 +726,17 @@ def clean_files(file_list):
 
 @app.route("/view_print")
 def view_print_pdf():
-    return render_template('viewPrintPDF.html')
+    pdf_files = [
+        {"name": "CF-1 Form", "url": "/static/pdfs/output_cf1.pdf"},
+        {"name": "CF-2 Form", "url": "/static/pdfs/output_cf2.pdf"},
+        {"name": "CSF Form", "url": "/static/pdfs/output_csf.pdf"},
+        {"name": "Statement of Account", "url": "/static/pdfs/output_soa.pdf"},
+    ]
+    return render_template('viewPrintPDF.html', pdf_files=pdf_files)
+
+@app.route("/reports")
+def view_reports():
+    return render_template('reports.html')
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=True)
