@@ -1,7 +1,7 @@
 from flask import Flask, render_template, request, jsonify, current_app
 from fillpdf import fillpdfs
 from pdfrw import PdfReader as PdfRwReader, PdfWriter as PdfRwWriter, PageMerge, PdfDict, PdfName
-from datetime import datetime, date
+from datetime import datetime, date, timedelta
 # from pdf2image import convert_from_path
 # import img2pdf
 import os
@@ -25,29 +25,49 @@ app = Flask(__name__)
 
 today = date.today()
 
-def flatten_pdf(input_pdf, output_pdf):
-    pdf = PdfRwReader(input_pdf)
-    for page in pdf.pages:
-        annots = page.get(PdfName('Annots'))
-        if not annots:
-            continue
-        for annot in annots:
-            subtype = annot.get(PdfName('Subtype'))
-            if subtype != PdfName('Widget'):
-                continue
-            ap = annot.get(PdfName('AP'))
-            if not isinstance(ap, PdfDict):
-                continue
-            n_ap = ap.get(PdfName('N'))
-            if n_ap and hasattr(n_ap, 'stream'):
-                try:
-                    PageMerge(page).add(n_ap).render()
-                except Exception as e:
-                    print("Skipping annotation:", e)
-        # Remove annotations so fields become static drawings
-        page[PdfName('Annots')] = []
-    PdfRwWriter().write(output_pdf, pdf)
-    print(f"Flattened PDF saved as {output_pdf}")
+def get_next_date(date=None):
+    if date is None:
+        date = datetime.today().date()
+
+    weekday = date.weekday()  # Monday=0 ... Sunday=6
+
+    # Monday (0) to Wednesday (2) → Thursday
+    if weekday <= 2:
+        target_weekday = 3  # Thursday
+    else:
+        target_weekday = 0  # Monday
+
+    days_ahead = (target_weekday - weekday + 7) % 7
+    if days_ahead == 0:
+        days_ahead = 7
+
+    next_date = date + timedelta(days=days_ahead)
+    return next_date.strftime("%m-%d-%Y")
+
+
+# def flatten_pdf(input_pdf, output_pdf):
+#     pdf = PdfRwReader(input_pdf)
+#     for page in pdf.pages:
+#         annots = page.get(PdfName('Annots'))
+#         if not annots:
+#             continue
+#         for annot in annots:
+#             subtype = annot.get(PdfName('Subtype'))
+#             if subtype != PdfName('Widget'):
+#                 continue
+#             ap = annot.get(PdfName('AP'))
+#             if not isinstance(ap, PdfDict):
+#                 continue
+#             n_ap = ap.get(PdfName('N'))
+#             if n_ap and hasattr(n_ap, 'stream'):
+#                 try:
+#                     PageMerge(page).add(n_ap).render()
+#                 except Exception as e:
+#                     print("Skipping annotation:", e)
+#         # Remove annotations so fields become static drawings
+#         page[PdfName('Annots')] = []
+#     PdfRwWriter().write(output_pdf, pdf)
+#     print(f"Flattened PDF saved as {output_pdf}")
 
 @app.route("/")
 def index():
@@ -60,6 +80,9 @@ def submit_form():
     patient_data = dict(data)
     print(pretty_json_string)
 
+    # Optional: delete individual PDFs
+    clean_files(["output_cf1.pdf", "output_cf2.pdf","output_csf.pdf", "output_soa.pdf"])
+
     fill_cf1(patient_data)
     fill_csf(patient_data)
     fill_cf2(patient_data)
@@ -70,8 +93,6 @@ def submit_form():
     # Merge all flattened PDFs
     # merge_pdfs(["output_cf1.pdf", "output_csf.pdf", "output_soa.pdf"], "final_merged.pdf")
 
-    # Optional: delete individual PDFs
-    #clean_files(["output_cf1.pdf", "output_csf.pdf", "output_soa.pdf"])
 
     return jsonify({"status": "success", "message": "Form received"})
 
@@ -96,6 +117,17 @@ def split_pin(pin_str):
 
     return [first_two, middle, last_digit]
 
+def spacing(data):
+    new_data = " "
+    i = 2
+    for letter in data:
+        if i % 2 == 0:
+            new_data += letter + "  "
+        else:
+            new_data += letter + "   "
+        i += 1
+    return new_data
+
 def fill_cf1(data):
 
     pdf_path = os.path.join(current_app.root_path,"template_cf1.pdf")
@@ -103,21 +135,15 @@ def fill_cf1(data):
 
     try:
         form_fields_cf1 = list(fillpdfs.get_form_fields(pdf_path).keys())
+
         patients_pin = split_pin(data['pin'])
         # new_pin = '\t\t\t'.join(patients_pin[1])
-        new_pin = " "
-        i = 2
-        for letter in patients_pin[1]:
-            if i % 2 == 0:
-                new_pin += letter + "  "
-            else:
-                new_pin += letter + "   "
-            i += 1
-        print(new_pin)
+        patients_pin[0] = spacing(patients_pin[0])
+        patients_pin[1] = spacing(patients_pin[1])
         birthDate = data['dob'].split('-')
 
         memberMale = "Yes_xqqa" if data['sex'].lower() == "male" else None
-        memberFemale = "Yes_xqqa" if data['sex'].lower() == "female" else None
+        memberFemale = "Yes_nnyk" if data['sex'].lower() == "female" else None
 
         depPin = ["", "", ""]
         depDob = ["", "", ""]
@@ -164,7 +190,7 @@ def fill_cf1(data):
 
         memberMiddleI = data.get('middleName', '')
         memberPrintedName = f"{data.get('firstName', '').upper()} {memberMiddleI[0].upper() + '.' if memberMiddleI else ''} {data.get('lastName', '').upper()} {data.get('nameExt', '')}".strip()
-        memberSignDate = [today.month, today.day, today.year]
+        memberSignDate = [f"{today.month:02}", f"{today.day:02}", today.year]
         repSignDate = ["", "", ""]
 
         if data.get('signee', '').lower() == "representative":
@@ -175,7 +201,7 @@ def fill_cf1(data):
 
             rep = data.get('representative', {})
             repPrintedName = rep.get('repName')
-            repSignDate = [today.month, today.day, today.year]
+            repSignDate = [f"{today.month:02}", f"{today.day:02}", today.year]
 
             repRel_value = rep.get('repRelationship', '').lower()
 
@@ -202,7 +228,7 @@ def fill_cf1(data):
 
         data_dict = {
             form_fields_cf1[form_fields_cf1.index("pin0")]: patients_pin[0],
-            form_fields_cf1[form_fields_cf1.index("pin1")]: new_pin,
+            form_fields_cf1[form_fields_cf1.index("pin1")]: patients_pin[1],
             form_fields_cf1[form_fields_cf1.index("pin2")]: patients_pin[2],
             form_fields_cf1[form_fields_cf1.index("lastName")]: data['lastName'].upper(),
             form_fields_cf1[form_fields_cf1.index("firstName")]: data['firstName'].upper(),
@@ -215,7 +241,7 @@ def fill_cf1(data):
             form_fields_cf1[form_fields_cf1.index("memberFemale")]: memberFemale,
             form_fields_cf1[form_fields_cf1.index("street")]: data['street'],
             form_fields_cf1[form_fields_cf1.index("barangay")]: data['barangay'].upper(),
-            form_fields_cf1[form_fields_cf1.index("municipality")]: "BURAUEN",
+            form_fields_cf1[form_fields_cf1.index("municipality")]: data['municipality'].upper(),
             form_fields_cf1[form_fields_cf1.index("province")]: "LEYTE",
             form_fields_cf1[form_fields_cf1.index("country")]: "PHILLIPPINES",
             form_fields_cf1[form_fields_cf1.index("zipcode")]: "6516",
@@ -243,7 +269,7 @@ def fill_cf1(data):
             form_fields_cf1[form_fields_cf1.index("memberCertSignature")]: memberPrintedName,
             form_fields_cf1[form_fields_cf1.index("memberCertRepSignature")]: repPrintedName,
 
-            form_fields_cf1[form_fields_cf1.index("memberDateSignedMonth")]: memberSignDate[0],
+            form_fields_cf1[form_fields_cf1.index("memberDateSignedMonth")]: "01",
             form_fields_cf1[form_fields_cf1.index("memberDateSignedDay")]: memberSignDate[1],
             form_fields_cf1[form_fields_cf1.index("memberDateSignedYear")]: memberSignDate[2],
 
@@ -277,7 +303,7 @@ def fill_cf2(data):
         output_pdf = os.path.join(current_app.root_path, "static", "pdfs", "output_cf2.pdf")
 
         form_fields_cf2 = list(fillpdfs.get_form_fields(pdf_path).keys())
-        print(form_fields_cf2)
+        next_date = get_next_date().split('-')
 
         PAN = "E08039067"
         HCIName = "BURAUEN MUNICIPAL HEALTH OFFICE ANIMAL BITE TREATMENT CENTER"
@@ -292,8 +318,8 @@ def fill_cf2(data):
         GrandTotal = "P 5,850.00"
         AccreditationNo = ["1100", "1945935","3"]
 
-        date_admitted = [today.month, today.day, today.year]
-        date_signed = [today.month, today.day, today.year]
+        date_admitted = [f"{today.month:02}", f"{today.day:02}", today.year]
+        date_signed = [f"{today.month:02}", f"{today.day:02}", today.year]
 
         patientFname = data["firstName"].upper()
         patientMname = data["middleName"].upper()
@@ -381,8 +407,8 @@ def fill_cf2(data):
             form_fields_cf2[form_fields_cf2.index("RelatedProcedure")]: RelatedProcedures,
 
             form_fields_cf2[form_fields_cf2.index("RVSCode1")]: RVSCode,
-            form_fields_cf2[form_fields_cf2.index("DateProcedure")]: f"{date_admitted[0]}-{date_admitted[1]}-{date_admitted[2]}",
-            form_fields_cf2[form_fields_cf2.index("Day0ARV")]: f"{date_admitted[0]}-{date_admitted[1]}-{date_admitted[2]}",
+            form_fields_cf2[form_fields_cf2.index("DateProcedure")]: f"{date_admitted[0]}- \t\t -{date_admitted[2]}\n\n{next_date[0]}- \t\t -{next_date[2]}",
+            form_fields_cf2[form_fields_cf2.index("Day0ARV")]: f"{date_admitted[0]}- \t\t -{date_admitted[2]}",
             form_fields_cf2[form_fields_cf2.index("RVSCode2")]: RVSCode,
             form_fields_cf2[form_fields_cf2.index("text_43ecxb")]: consentFormName,
 
@@ -393,14 +419,14 @@ def fill_cf2(data):
             form_fields_cf2[form_fields_cf2.index("NoCoCopy")]: "Yes_vzps",
 
             form_fields_cf2[form_fields_cf2.index("AccreditationSignedMonth")]: date_signed[0],
-            form_fields_cf2[form_fields_cf2.index("AccreditationSignedDay")]: date_signed[1],
+            form_fields_cf2[form_fields_cf2.index("AccreditationSignedDay")]: "",
             form_fields_cf2[form_fields_cf2.index("AccreditationSignedYear")]: date_signed[2],
 
             form_fields_cf2[form_fields_cf2.index("ConsumptionBenefit1")]: "Yes_vzps",
             form_fields_cf2[form_fields_cf2.index("GrandTotal")]: GrandTotal,
 
             form_fields_cf2[form_fields_cf2.index("MemberDateSignMonth")]: date_signed[0],
-            form_fields_cf2[form_fields_cf2.index("MemberDateSignDay")]: date_signed[1],
+            form_fields_cf2[form_fields_cf2.index("MemberDateSignDay")]: "",
             form_fields_cf2[form_fields_cf2.index("MemberDateSignYear")]: date_signed[2],
 
             form_fields_cf2[form_fields_cf2.index("RelationshipSpouse")]: repRelationSpouse,
@@ -416,7 +442,7 @@ def fill_cf2(data):
             form_fields_cf2[form_fields_cf2.index("Designation")]: Designation,
 
             form_fields_cf2[form_fields_cf2.index("AuthorizedSignMonth")]: date_signed[0],
-            form_fields_cf2[form_fields_cf2.index("AuthorizedSignDay")]: date_signed[1],
+            form_fields_cf2[form_fields_cf2.index("AuthorizedSignDay")]: "",
             form_fields_cf2[form_fields_cf2.index("AuthorizedSignYear")]: date_signed[2],
         }
 
@@ -469,7 +495,7 @@ def fill_csf(data):
     
     memberMiddleI = data.get('middleName', '')
     memberPrintedName = f"{data.get('firstName', '').upper()} {memberMiddleI[0].upper() + '.' if memberMiddleI else ''} {data.get('lastName', '').upper()} {data.get('nameExt', '')}".strip()
-    memberSignDate = [today.month, today.day, today.year]
+    memberSignDate = [f"{today.month:02}", f"{today.day:02}", today.year]
     repSignDate = ["", "", ""]
     consentName = memberPrintedName
     consentIsRepresentativeSign = ""
@@ -489,7 +515,7 @@ def fill_csf(data):
         rep = data.get('representative', {})
         repPrintedName = rep.get('repName')
         consentName = repPrintedName
-        repSignDate = [today.month, today.day, today.year]
+        repSignDate = [f"{today.month:02}", f"{today.day:02}", today.year]
         isRepresentative = "Yes_ltey"
 
         repRel_value = rep.get('repRelationship', '').lower()
@@ -514,7 +540,7 @@ def fill_csf(data):
         else:
             repIncapacitated = "Yes_xqqa"
 
-    date_admitted = [today.month, today.day, today.year]
+    date_admitted = [f"{today.month:02}", f"{today.day:02}", today.year]
 
     data_dict_csf = {
         # -----------------------------
@@ -602,8 +628,8 @@ def fill_csf(data):
         form_fields_csf[form_fields_csf.index("repDateSignedDay")]: repSignDate[1],
         form_fields_csf[form_fields_csf.index("repDateSignedYear")]: repSignDate[2],
 
-        form_fields_csf[form_fields_csf.index("consentDateMonth")]: today.month,
-        form_fields_csf[form_fields_csf.index("consentDateDay")]: today.day,
+        form_fields_csf[form_fields_csf.index("consentDateMonth")]: f"{today.month:02}",
+        form_fields_csf[form_fields_csf.index("consentDateDay")]: f"{today.day:02}",
         form_fields_csf[form_fields_csf.index("consentDateYear")]: today.year,
         form_fields_csf[form_fields_csf.index("repSpouse1")]: depSpouse,
         form_fields_csf[form_fields_csf.index("repChild1")]: depChild,
@@ -619,15 +645,15 @@ def fill_csf(data):
         form_fields_csf[form_fields_csf.index("accreditationNo1")]: "1945935",
         form_fields_csf[form_fields_csf.index("accreditationNo2")]: "3",
         form_fields_csf[form_fields_csf.index("healthCareSignature")]: doctor,
-        form_fields_csf[form_fields_csf.index("healthCareSignedMonth")]: today.month,
-        form_fields_csf[form_fields_csf.index("healthCareSignedDay")]: today.day,
+        form_fields_csf[form_fields_csf.index("healthCareSignedMonth")]: f"{today.month:02}",
+        form_fields_csf[form_fields_csf.index("healthCareSignedDay")]: "",
         form_fields_csf[form_fields_csf.index("healthCareSignedYear")]: today.year,
 
         form_fields_csf[form_fields_csf.index("RVSCode")]: "P90375",
         form_fields_csf[form_fields_csf.index("authHCI")]: doctor,
         form_fields_csf[form_fields_csf.index("Designation")]: "PHYSICIAN",
-        form_fields_csf[form_fields_csf.index("providerSignedMonth")]: today.month,
-        form_fields_csf[form_fields_csf.index("providerSignedDay")]: today.day,
+        form_fields_csf[form_fields_csf.index("providerSignedMonth")]: f"{today.month:02}",
+        form_fields_csf[form_fields_csf.index("providerSignedDay")]: "",
         form_fields_csf[form_fields_csf.index("providerSignedYear")]: today.year,       
         
     }
@@ -641,6 +667,7 @@ def fill_soa(data):
     output_pdf = os.path.join(current_app.root_path, "static", "pdfs", "output_soa.pdf")
 
     form_fields_soa = list(fillpdfs.get_form_fields(pdf_path).keys())
+    print(form_fields_soa)
 
     # Get the current date and time
     now = datetime.now()
@@ -668,7 +695,7 @@ def fill_soa(data):
     if (today.month, today.day) < (birth_date.month, birth_date.day):
         age -= 1
 
-    address = f"{data.get('street', '')} {data.get('barangay','')}, Burauen, Leyte"
+    address = f"{data.get('street', '')} {data.get('barangay','')}, {data.get('municipality','')}, Leyte"
 
     if data.get('signee','') == 'representative':
         signatory = data['representative']['repName']
@@ -718,8 +745,8 @@ def merge_pdfs(pdf_list, output_pdf):
 def clean_files(file_list):
     for f in file_list:
         try:
-            if os.path.exists(f):
-                os.remove(f)
+            if os.path.exists(os.path.join(current_app.root_path, "static", "pdfs", f)):
+                os.remove(os.path.join(current_app.root_path, "static", "pdfs", f))
                 print(f"Deleted {f}")
         except Exception as e:
             print(f"Error deleting {f}: {e}")

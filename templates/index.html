@@ -269,85 +269,13 @@
                                            placeholder="Street / Subdivision / Village">
                                 </div>
                                 <div class="col-md-6 mb-2-5">
-                                    <select class="form-select" name="barangay" required>
+                                    <select class="form-select" id="municipality" name="municipality" required>
+                                        <option value="">Choose Municipality...</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-6 mb-2-5">
+                                    <select class="form-select" name="barangay" id="barangay" required>
                                         <option value="">Choose barangay...</option>
-                                        <option>Abuyogon</option>
-                                        <option>Anonang</option>
-                                        <option>Arado</option>
-                                        <option>Balao</option>
-                                        <option>Balatson</option>
-                                        <option>Balorinay</option>
-                                        <option>Bobon</option>
-                                        <option>Buenavista</option>
-                                        <option>Buri</option>
-                                        <option>Caanislagan</option>
-                                        <option>Cadahunan</option>
-                                        <option>Cagangon</option>
-                                        <option>Calao</option>
-                                        <option>Cali</option>
-                                        <option>Calsadahay</option>
-                                        <option>Candag-on</option>
-                                        <option>Cansiboy</option>
-                                        <option>Catagbacan</option>
-                                        <option>Dumalag</option>
-                                        <option>Damulu-an</option>
-                                        <option>Dina-ayan</option>
-                                        <option>Esperansa</option>
-                                        <option>Gamay</option>
-                                        <option>Gitablan</option>
-                                        <option>Hapunan</option>
-                                        <option>Hibonawan</option>
-                                        <option>Hugpa East</option>
-                                        <option>Hugpa West</option>
-                                        <option>Ilihan</option>
-                                        <option>Kagbana</option>
-                                        <option>Kalipayan</option>
-                                        <option>Kaparasanan</option>
-                                        <option>Laguiwan</option>
-                                        <option>Libas</option>
-                                        <option>Limburan</option>
-                                        <option>Logsongan</option>
-                                        <option>Maabab</option>
-                                        <option>Maghubas</option>
-                                        <option>Mahagnao</option>
-                                        <option>Malabca</option>
-                                        <option>Malaguinabot</option>
-                                        <option>Malaihao</option>
-                                        <option>Matin-ao</option>
-                                        <option>Moguing</option>
-                                        <option>Poblacion District I</option>
-                                        <option>Poblacion District II</option>
-                                        <option>Poblacion District III</option>
-                                        <option>Poblacion District IV</option>
-                                        <option>Poblacion District V</option>
-                                        <option>Poblacion District VI</option>
-                                        <option>Poblacion District VII</option>
-                                        <option>Poblacion District VIII</option>
-                                        <option>Poblacion District IX</option>
-                                        <option>Paghudlan</option>
-                                        <option>Paitan</option>
-                                        <option>Pangdan</option>
-                                        <option>Patag</option>
-                                        <option>Patong</option>
-                                        <option>Pawa</option>
-                                        <option>Roxas</option>
-                                        <option>Sambel</option>
-                                        <option>San Esteban</option>
-                                        <option>San Fernando</option>
-                                        <option>San Jose East</option>
-                                        <option>San Jose West</option>
-                                        <option>San Pablo</option>
-                                        <option>Tabuanon</option>
-                                        <option>Tagadtaran</option>
-                                        <option>Taghuyan</option>
-                                        <option>Takin</option>
-                                        <option>Tambis</option>
-                                        <option>Tambuko</option>
-                                        <option>Toloyao</option>
-                                        <option>Villa Aurora</option>
-                                        <option>Villa Corazon</option>
-                                        <option>Villa Patria</option>
-                                        <option>Villa Rosas</option>
                                     </select>
                                 </div>
                             </div>
@@ -593,6 +521,7 @@
             sex: form.sex.value,
             street: form.street.value,
             barangay: form.barangay.value,
+            municipality: form.municipality.value,
             mobile: form.mobile.value,
             email: form.email.value,
             patientIsMember: patientIsMemberValue,
@@ -655,6 +584,56 @@
             // Initialize on load
             updateRepresentativeSection();
             document.querySelector('input[name="patientIsMember"]:checked').dispatchEvent(new Event('change'));
+        </script>
+        <script>
+            let leyteData = {};
+            let leyteBrgy = {};
+
+            fetch("{{ url_for('static', filename='data/municipalities.json') }}")
+                .then(response => response.json())
+                .then(data => {
+                    leyteData = data;
+                    populateMunicipalities();
+                })
+                .catch(error => console.error("Error loading JSON:",error))
+
+            fetch("{{ url_for('static', filename='data/barangays.json') }}")
+                .then(response => response.json())
+                .then(data => {
+                    leyteBrgy = data;
+                })
+                .catch(error => console.error("Error loading JSON:",error))
+            
+            function populateMunicipalities(){
+                const municipalitySelect = document.getElementById("municipality");
+
+                for(let iteration in leyteData){
+                    const option = document.createElement('option');
+                    option.value = leyteData[iteration].name
+                    option.text = leyteData[iteration].name
+                    municipalitySelect.appendChild(option);
+                }
+      
+            }
+
+            document.getElementById('municipality').addEventListener("change", function () {
+                const barangaySelect = document.getElementById("barangay");
+                barangaySelect.innerHTML = '<option value="">-- Select Barangay --</option>';
+                const selectedMunicipality = this.value;
+                const filterBrgy = leyteBrgy.filter(
+                    item => item.citymun === selectedMunicipality
+                )
+
+                filterBrgy.forEach( brgy => {
+                    const option = document.createElement("option");
+                    option.value = brgy.name
+                    option.text = brgy.name
+                    barangaySelect.appendChild(option)
+                })
+
+            })
+            
+
         </script>
     </body>
 </html>

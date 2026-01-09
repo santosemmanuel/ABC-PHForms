@@ -2,7 +2,7 @@
 title Flask Project Launcher
 
 REM === Change these paths to match your project ===
-set PROJECT_DIR=C:\Users\Client-PC\Desktop\Animal Bite Philhealth Forms\ABC-PHForms
+set PROJECT_DIR=D:\IT\Projects\Animal Bite Philhealth Forms\ABC-PHForms
 set VENV_DIR=%PROJECT_DIR%\venv
 set FLASK_APP=app.py
 
