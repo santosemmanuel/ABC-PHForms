@@ -9,7 +9,7 @@ import json
 
 # Initialize Flask app
 app = Flask(__name__)
-    
+
 # PdfWriter().write(output_pdf, pdf)
 
 # Send the filled PDF as a download
@@ -24,6 +24,7 @@ app = Flask(__name__)
 #     print("PDF does NOT have fillable form fields.")
 
 today = date.today()
+
 
 def get_next_date(date=None):
     if date is None:
@@ -73,6 +74,7 @@ def get_next_date(date=None):
 def index():
     return render_template('index.html')
 
+
 @app.route("/submit_form", methods=["POST"])
 def submit_form():
     data = request.get_json()
@@ -81,7 +83,8 @@ def submit_form():
     print(pretty_json_string)
 
     # Optional: delete individual PDFs
-    clean_files(["output_cf1.pdf", "output_cf2.pdf","output_csf.pdf", "output_soa.pdf"])
+    clean_files(["output_cf1.pdf", "output_cf2.pdf",
+                "output_csf.pdf", "output_soa.pdf"])
 
     fill_cf1(patient_data)
     fill_csf(patient_data)
@@ -89,12 +92,12 @@ def submit_form():
     fill_soa(patient_data)
     # Debug: see the data received
     # TODO: Save to database or process
-   
+
     # Merge all flattened PDFs
     # merge_pdfs(["output_cf1.pdf", "output_csf.pdf", "output_soa.pdf"], "final_merged.pdf")
 
-
     return jsonify({"status": "success", "message": "Form received"})
+
 
 def split_pin(pin_str):
     """
@@ -102,7 +105,7 @@ def split_pin(pin_str):
     - first two digits
     - middle digits
     - last digit
-    
+
     Example:
         '123456789012' → ('12', '345678901', '2')
     """
@@ -117,6 +120,7 @@ def split_pin(pin_str):
 
     return [first_two, middle, last_digit]
 
+
 def spacing(data):
     new_data = " "
     i = 2
@@ -128,10 +132,12 @@ def spacing(data):
         i += 1
     return new_data
 
+
 def fill_cf1(data):
 
-    pdf_path = os.path.join(current_app.root_path,"template_cf1.pdf")
-    output_pdf = os.path.join(current_app.root_path, "static", "pdfs", "output_cf1.pdf")
+    pdf_path = os.path.join(current_app.root_path, "template_cf1.pdf")
+    output_pdf = os.path.join(current_app.root_path,
+                              "static", "pdfs", "output_cf1.pdf")
 
     try:
         form_fields_cf1 = list(fillpdfs.get_form_fields(pdf_path).keys())
@@ -189,7 +195,8 @@ def fill_cf1(data):
         signMember = "Yes_xqqa"
 
         memberMiddleI = data.get('middleName', '')
-        memberPrintedName = f"{data.get('firstName', '').upper()} {memberMiddleI[0].upper() + '.' if memberMiddleI else ''} {data.get('lastName', '').upper()} {data.get('nameExt', '')}".strip()
+        memberPrintedName = f"{data.get('firstName', '').upper()} {memberMiddleI[0].upper() + '.' if memberMiddleI else ''} {data.get('lastName', '').upper()} {data.get('nameExt', '')}".strip(
+        )
         memberSignDate = [f"{today.month:02}", f"{today.day:02}", today.year]
         repSignDate = ["", "", ""]
 
@@ -224,7 +231,6 @@ def fill_cf1(data):
                 repOther = "Yes_xqqa"
             else:
                 repIncapacitated = "Yes_xqqa"
-
 
         data_dict = {
             form_fields_cf1[form_fields_cf1.index("pin0")]: patients_pin[0],
@@ -290,17 +296,18 @@ def fill_cf1(data):
             form_fields_cf1[form_fields_cf1.index("repOtherReasons")]: repOther
         }
 
-    
         fillpdfs.write_fillable_pdf(pdf_path, output_pdf, data_dict)
         # fillpdfs.flatten_pdf(output_pdf, output_pdf, as_images=True)
     except Exception as e:
         print(f"This is the error {e}")
 
+
 def fill_cf2(data):
 
     try:
-        pdf_path = os.path.join(current_app.root_path,"template_cf2.pdf")
-        output_pdf = os.path.join(current_app.root_path, "static", "pdfs", "output_cf2.pdf")
+        pdf_path = os.path.join(current_app.root_path, "template_cf2.pdf")
+        output_pdf = os.path.join(
+            current_app.root_path, "static", "pdfs", "output_cf2.pdf")
 
         form_fields_cf2 = list(fillpdfs.get_form_fields(pdf_path).keys())
         next_date = get_next_date().split('-')
@@ -316,7 +323,7 @@ def fill_cf2(data):
         Doctor = "MA. QUEENA JOVE Q. SERRANO MD"
         Designation = "PHYSICIAN"
         GrandTotal = "P 5,850.00"
-        AccreditationNo = ["1100", "1945935","3"]
+        AccreditationNo = ["1100", "1945935", "3"]
 
         date_admitted = [f"{today.month:02}", f"{today.day:02}", today.year]
         date_signed = [f"{today.month:02}", f"{today.day:02}", today.year]
@@ -349,7 +356,8 @@ def fill_cf2(data):
                 dispositionTransferred = "Yes_vzps"
 
         memberMiddleI = data.get('middleName', '')
-        consentFormName = f"{data.get('firstName', '').upper()} {memberMiddleI[0].upper() + '.' if memberMiddleI else ''} {data.get('lastName', '').upper()} {data.get('nameExt', '')}".strip()
+        consentFormName = f"{data.get('firstName', '').upper()} {memberMiddleI[0].upper() + '.' if memberMiddleI else ''} {data.get('lastName', '').upper()} {data.get('nameExt', '')}".strip(
+        )
         repRelationChild = repRelationSpouse = repRelationSibling = repRelationParent = repRelationOthers = repOther = repIncapcitated = ""
 
         if data.get('signee', '').lower() == "representative":
@@ -373,7 +381,7 @@ def fill_cf2(data):
                 repOther = "Yes_cdvw"
             else:
                 repIncapcitated = "Yes_cdvw"
-                    
+
         data_dict_cf2 = {
             form_fields_cf2[form_fields_cf2.index("checkbox_12ekrw")]: "",
             form_fields_cf2[form_fields_cf2.index("PAN")]: PAN,
@@ -450,13 +458,15 @@ def fill_cf2(data):
     except Exception as e:
         print(f"This is the error {e}")
 
+
 def fill_csf(data):
 
-    pdf_path = os.path.join(current_app.root_path,"template_csf.pdf")
-    output_pdf = os.path.join(current_app.root_path, "static", "pdfs", "output_csf.pdf")
+    pdf_path = os.path.join(current_app.root_path, "template_csf.pdf")
+    output_pdf = os.path.join(current_app.root_path,
+                              "static", "pdfs", "output_csf.pdf")
 
     form_fields_csf = list(fillpdfs.get_form_fields(pdf_path).keys())
-    #print(form_fields_csf)
+    # print(form_fields_csf)
 
     patients_pin = split_pin(data['pin'])
     birthDate = data['dob'].split('-')
@@ -466,21 +476,24 @@ def fill_csf(data):
     memberMale = "Yes_xqqa" if data['sex'].lower() == "male" else None
     memberFemale = "Yes_xqqa" if data['sex'].lower() == "female" else None
 
-    dep_pin = ["","",""]
-    dep_bd = ["","",""]
-    depChild = depParent = depSpouse = depLname = depFname = depExt = depMname = ""
-    
+    dep_pin = ["", "", ""]
+    dep_bd = ["", "", ""]
+    depChild = depParent = depSpouse = ""
+    depLname = data["lastName"].upper()
+    depFname = data["firstName"].upper()
+    depExt = data["nameExt"].upper()
+    depMname = data["middleName"].upper()
+
     if data["dependent"]:
         dep_pin = split_pin(data["dependent"]["depPin"])
         dep_bd = data["dependent"]["depDob"].split("-")
 
         relationship_value = data["dependent"]["relationship"].lower()
-        
+
         depLname = data['dependent']['depLname'].upper()
         depFname = data['dependent']['depFname'].upper()
         depExt = data['dependent']['depExt'].upper()
         depMname = data['dependent']['depMname'].upper()
-
 
         match relationship_value:
             case "child":
@@ -492,18 +505,19 @@ def fill_csf(data):
 
     isRepresentative = repPrintedName = repRelationSpouse = repRelationChild = repRelationSibling = repRelationParent = repRelationOthers = repOther = repIncapacitated = ""
     signMember = "Yes_ltey"
-    
+
     memberMiddleI = data.get('middleName', '')
-    memberPrintedName = f"{data.get('firstName', '').upper()} {memberMiddleI[0].upper() + '.' if memberMiddleI else ''} {data.get('lastName', '').upper()} {data.get('nameExt', '')}".strip()
+    memberPrintedName = f"{data.get('firstName', '').upper()} {memberMiddleI[0].upper() + '.' if memberMiddleI else ''} {data.get('lastName', '').upper()} {data.get('nameExt', '')}".strip(
+    )
     memberSignDate = [f"{today.month:02}", f"{today.day:02}", today.year]
     repSignDate = ["", "", ""]
     consentName = memberPrintedName
     consentIsRepresentativeSign = ""
     consentIsMemberSign = "Yes_ltey"
 
-    if data.get('signee','').lower() == "member" and data.get('patientIsMember','') == "yes":
+    if data.get('signee', '').lower() == "member" and data.get('patientIsMember', '') == "yes":
         consentIsMemberSign = "Yes_ltey"
-    
+
     if data.get('signee', '').lower() == "representative":
         isRepresentative = "Yes_ltey"
         consentIsRepresentativeSign = "Yes_ltey"
@@ -580,9 +594,9 @@ def fill_csf(data):
         form_fields_csf[form_fields_csf.index("dependentPin1")]: dep_pin[1] if dep_pin else "",
         form_fields_csf[form_fields_csf.index("dependentPin2")]: dep_pin[2] if dep_pin else "",
 
-        form_fields_csf[form_fields_csf.index("patientDOBMonth")]: dep_bd[1] if dep_bd else "",
-        form_fields_csf[form_fields_csf.index("patientDOBDay")]: dep_bd[2] if dep_bd else "",
-        form_fields_csf[form_fields_csf.index("patientDOBYear")]: dep_bd[0] if dep_bd else "",
+        form_fields_csf[form_fields_csf.index("patientDOBMonth")]: dep_bd[1] if dep_bd[1] else birthDate[1],
+        form_fields_csf[form_fields_csf.index("patientDOBDay")]: dep_bd[2] if dep_bd[2] else birthDate[2],
+        form_fields_csf[form_fields_csf.index("patientDOBYear")]: dep_bd[0] if dep_bd[0] else birthDate[0],
 
         # # -----------------------------
         # # Relationship Checkboxes
@@ -637,10 +651,10 @@ def fill_csf(data):
         form_fields_csf[form_fields_csf.index("repSibling1")]: repRelationSibling,
         form_fields_csf[form_fields_csf.index("repOther1")]: repRelationOthers,
 
-        form_fields_csf[form_fields_csf.index("SignatureMemberRep")]: consentName, 
+        form_fields_csf[form_fields_csf.index("SignatureMemberRep")]: consentName,
         form_fields_csf[form_fields_csf.index("ifPatient")]: consentIsMemberSign,
         form_fields_csf[form_fields_csf.index("ifRepresentative")]: consentIsRepresentativeSign,
-        
+
         form_fields_csf[form_fields_csf.index("accreditationNo0")]: "1100",
         form_fields_csf[form_fields_csf.index("accreditationNo1")]: "1945935",
         form_fields_csf[form_fields_csf.index("accreditationNo2")]: "3",
@@ -654,17 +668,19 @@ def fill_csf(data):
         form_fields_csf[form_fields_csf.index("Designation")]: "PHYSICIAN",
         form_fields_csf[form_fields_csf.index("providerSignedMonth")]: f"{today.month:02}",
         form_fields_csf[form_fields_csf.index("providerSignedDay")]: "",
-        form_fields_csf[form_fields_csf.index("providerSignedYear")]: today.year,       
-        
+        form_fields_csf[form_fields_csf.index("providerSignedYear")]: today.year,
+
     }
-  
+
     fillpdfs.write_fillable_pdf(pdf_path, output_pdf, data_dict_csf)
-    #flatten_pdf(output_pdf, output_pdf)
+    # flatten_pdf(output_pdf, output_pdf)
+
 
 def fill_soa(data):
-    
-    pdf_path = os.path.join(current_app.root_path,"template_soa.pdf")
-    output_pdf = os.path.join(current_app.root_path, "static", "pdfs", "output_soa.pdf")
+
+    pdf_path = os.path.join(current_app.root_path, "template_soa.pdf")
+    output_pdf = os.path.join(current_app.root_path,
+                              "static", "pdfs", "output_soa.pdf")
 
     form_fields_soa = list(fillpdfs.get_form_fields(pdf_path).keys())
     print(form_fields_soa)
@@ -681,11 +697,10 @@ def fill_soa(data):
     # Calculate age
     age = today.year - birth_date.year
 
-    
     memberMiddleI = data.get('middleName', '')
     patientName = f"{data.get('firstName', '').upper()} {memberMiddleI[0].upper() + '.' if memberMiddleI else ''} {data.get('lastName', '').upper()} {data.get('nameExt', '')}".strip()
-    signatory = patientName 
-    
+    signatory = patientName
+
     if data['patientIsMember'] == "no":
         memberMiddleI = data['dependent']['depMname']
         patientName = f"{data['dependent']['depFname'].upper()} {memberMiddleI[0].upper() + '.' if memberMiddleI else ''} {data['dependent']['depLname'].upper()} {data['dependent']['depExt']}".strip()
@@ -697,7 +712,7 @@ def fill_soa(data):
 
     address = f"{data.get('street', '')} {data.get('barangay','')}, {data.get('municipality','')}, Leyte"
 
-    if data.get('signee','') == 'representative':
+    if data.get('signee', '') == 'representative':
         signatory = data['representative']['repName']
 
     data_dict_soa = {
@@ -711,6 +726,7 @@ def fill_soa(data):
 
     fillpdfs.write_fillable_pdf(pdf_path, output_pdf, data_dict_soa)
     # flatten_pdf(output_pdf, output_pdf)
+
 
 def merge_pdfs(pdf_list, output_pdf):
     from PyPDF2 import PdfMerger
@@ -742,14 +758,17 @@ def merge_pdfs(pdf_list, output_pdf):
     # print(f"Converted {input_pdf} → {output_pdf}")
     # return output_pdf
 
+
 def clean_files(file_list):
     for f in file_list:
         try:
             if os.path.exists(os.path.join(current_app.root_path, "static", "pdfs", f)):
-                os.remove(os.path.join(current_app.root_path, "static", "pdfs", f))
+                os.remove(os.path.join(
+                    current_app.root_path, "static", "pdfs", f))
                 print(f"Deleted {f}")
         except Exception as e:
             print(f"Error deleting {f}: {e}")
+
 
 @app.route("/view_print")
 def view_print_pdf():
@@ -761,9 +780,11 @@ def view_print_pdf():
     ]
     return render_template('viewPrintPDF.html', pdf_files=pdf_files)
 
+
 @app.route("/reports")
 def view_reports():
     return render_template('reports.html')
+
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=True)
