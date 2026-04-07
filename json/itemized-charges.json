@@ -1,0 +1,122 @@
+[
+  {
+    "date": "Feb 23, 2026",
+    "item": "WOUND CARE",
+    "unit": "",
+    "price": 300,
+    "qty": 1,
+    "amount": 300
+  },
+  {
+    "date": "Feb 23, 2026",
+    "item": "ANTI-RABIES SERUM (EQUINE) 400 IU/ml SOLUTION 5 mL VIAL",
+    "unit": "0.1 mL",
+    "price": 799,
+    "qty": 3,
+    "amount": 2397
+  },
+  {
+    "date": "Feb 23, 2026",
+    "item": "PARACETAMOL 500 mg TABLET",
+    "unit": "500 mg",
+    "price": 12,
+    "qty": 10,
+    "amount": 120
+  },
+  {
+    "date": "Feb 23, 2026",
+    "item": "CEFALEXIN ( as MONOHYDRATE) 500 mg CAPSULE",
+    "unit": "500 mg",
+    "price": 23,
+    "qty": 21,
+    "amount": 483
+  },
+  {
+    "date": "Feb 23, 2026",
+    "item": "SYRINGE DISPOSABLE ( 3.0 CC)",
+    "unit": "PIECE",
+    "price": 20,
+    "qty": 2,
+    "amount": 40
+  },
+  {
+    "date": "Feb 23, 2026",
+    "item": "SYRINGE DISPOSABLE 1 CC",
+    "unit": "PIECE",
+    "price": 15,
+    "qty": 2,
+    "amount": 30
+  },
+  {
+    "date": "Feb 23, 2026",
+    "item": "INSULIN SYRINGE 1ML",
+    "unit": "PIECE",
+    "price": 15,
+    "qty": 3,
+    "amount": 45
+  },
+  {
+    "date": "Feb 23, 2026",
+    "item": "COTTON BALL 5PCS/PACK",
+    "unit": "PACK",
+    "price": 30,
+    "qty": 1,
+    "amount": 30
+  },
+  {
+    "date": "Feb 23, 2026",
+    "item": "ALCOHOL ISOPROPHYL 70% 500ML",
+    "unit": "BOTTLE",
+    "price": 65,
+    "qty": 1,
+    "amount": 65
+  },
+  {
+    "date": "Feb 23, 2026",
+    "item": "RABIES IMMUNOGLOBULIN (HUMAN) 150 IU/mL SOLUTION 5 mL VIAL",
+    "unit": "150 IU/mL",
+    "price": 1010,
+    "qty": 1,
+    "amount": 1010
+  },
+  {
+    "date": "Feb 23, 2026",
+    "item": "ANTI-TETANUS SERUM (ATS) (EQUINE) 1500 IU/mL SOLUTION 5 mL VIAL",
+    "unit": "1500 IU/mL",
+    "price": 300,
+    "qty": 1,
+    "amount": 300
+  },
+  {
+    "date": "Feb 23, 2026",
+    "item": "GAUZE 4X4 (5PCS/PACK)",
+    "unit": "PACK",
+    "price": 50,
+    "qty": 1,
+    "amount": 50
+  },
+  {
+    "date": "Feb 23, 2026",
+    "item": "GLOVES - SURGICAL 7 1/2",
+    "unit": "PAIR",
+    "price": 30,
+    "qty": 1,
+    "amount": 30
+  },
+  {
+    "date": "Feb 23, 2026",
+    "item": "PLAIN NSS 1 LITER PLASTIC BOTTLE (NIR-NS)",
+    "unit": "BOTTLE",
+    "price": 150,
+    "qty": 1,
+    "amount": 150
+  },
+  {
+    "date": "Feb 23, 2026",
+    "item": "TETANUS TOXIOD 0.5 mL SOLUTION AMPULE",
+    "unit": "",
+    "price": 300,
+    "qty": 1,
+    "amount": 300
+  }
+]

@@ -1,173 +1,647 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>PDF Tabs Viewer</title>
-    <link href="{{ url_for('static', filename='css/bootstrap.min.css') }}"
-          rel="stylesheet">
+    <link
+      href="{{ url_for('static', filename='css/bootstrap.min.css') }}"
+      rel="stylesheet"
+    />
     <style>
-        :root {
-            --color-primary-green: #28a745; 
-            --color-dark-green: #1e7e34;
-            --color-text-dark: #343a40;
-            --color-bg-light: #f8f9fa;
-        }
+      :root {
+        --color-primary-green: #28a745;
+        --color-dark-green: #1e7e34;
+        --color-text-dark: #343a40;
+        --color-bg-light: #f8f9fa;
+      }
 
-        body {
-            background: var(--color-bg-light);
-            font-family: 'Inter', sans-serif;
-            color: var(--color-text-dark);
-        }
-        
-        /* Modern Container */
-        .modern-container {
-            max-width: 1300px;
-            margin: auto;
-            padding-top: 20px;
-            padding-bottom: 20px;
-        }
-        
-        /* --- UNIFIED HEADER STYLE (Copied from Index Page) --- */
-        .app-header {
-            background: linear-gradient(to right, var(--color-primary-green), #4CAF50);
-            color: white;
-            padding: 15px 30px;
-            border-radius: 12px;
-            margin-bottom: 25px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }
-        .app-header h1 {
-            font-size: 1.6rem;
-            font-weight: 700;
-            margin-bottom: 0;
-        }
-        .app-header .subtitle {
-            font-size: 0.95rem;
-            opacity: 0.9;
-            margin-top: 5px;
-        }
-        .mho-logo {
-            width: 50px;
-            height: 50px;
-            border-radius: 50%;
-            object-fit: cover;
-            margin-right: 15px;
-        }
-        .app-header .header-icon-right {
-            font-size: 2rem;
-            color: rgba(255, 255, 255, 0.8);
-        }
-        /* --- END UNIFIED HEADER STYLE --- */
+      body {
+        background: var(--color-bg-light);
+        font-family: "Inter", sans-serif;
+        color: var(--color-text-dark);
+      }
 
+      /* Modern Container */
+      .modern-container {
+        max-width: 1300px;
+        margin: auto;
+        padding-top: 20px;
+        padding-bottom: 20px;
+      }
 
-        /* --- Tab Navigation Styling (Rest of UI) --- */
-        .nav-pills .nav-link {
-            border-radius: 8px;
-            color: var(--color-text-dark);
-            font-weight: 500;
-            margin-right: 10px;
-            transition: all 0.2s;
-            padding: 8px 15px;
-        }
+      /* --- UNIFIED HEADER STYLE (Copied from Index Page) --- */
+      .app-header {
+        background: linear-gradient(
+          to right,
+          var(--color-primary-green),
+          #4caf50
+        );
+        color: white;
+        padding: 15px 30px;
+        border-radius: 12px;
+        margin-bottom: 25px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+      }
+      .app-header h1 {
+        font-size: 1.6rem;
+        font-weight: 700;
+        margin-bottom: 0;
+      }
+      .app-header .subtitle {
+        font-size: 0.95rem;
+        opacity: 0.9;
+        margin-top: 5px;
+      }
+      .mho-logo {
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        object-fit: cover;
+        margin-right: 15px;
+      }
+      .app-header .header-icon-right {
+        font-size: 2rem;
+        color: rgba(255, 255, 255, 0.8);
+      }
+      /* --- END UNIFIED HEADER STYLE --- */
 
-        .nav-pills .nav-link.active,
-        .nav-pills .nav-link:hover {
-            background-color: var(--color-primary-green);
-            color: white;
-        }
-        
-        /* --- Button Styling --- */
-        .btn-back-modern {
-            background-color: #6c757d; 
-            border-color: #6c757d;
-            border-radius: 8px;
-            font-weight: 500;
-            color: white;
-        }
-        .btn-back-modern:hover {
-            background-color: #5a6268;
-            border-color: #5a6268;
-            color: white;
-        }
+      /* --- Tab Navigation Styling (Rest of UI) --- */
+      .nav-pills .nav-link {
+        border-radius: 8px;
+        color: var(--color-text-dark);
+        font-weight: 500;
+        margin-right: 10px;
+        transition: all 0.2s;
+        padding: 8px 15px;
+      }
 
-        /* --- PDF Frame Styling --- */
-        .pdf-frame {
-            width: 100%;
-            height: 75vh;
-            border: 1px solid #ced4da;
-            border-radius: 12px;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
-        }
-        
+      .nav-pills .nav-link.active,
+      .nav-pills .nav-link:hover {
+        background-color: var(--color-primary-green);
+        color: white;
+      }
+
+      /* --- Button Styling --- */
+      .btn-back-modern {
+        background-color: #6c757d;
+        border-color: #6c757d;
+        border-radius: 8px;
+        font-weight: 500;
+        color: white;
+      }
+      .btn-back-modern:hover {
+        background-color: #5a6268;
+        border-color: #5a6268;
+        color: white;
+      }
+
+      /* --- PDF Frame Styling --- */
+      .pdf-frame {
+        width: 100%;
+        height: 75vh;
+        border: 1px solid #ced4da;
+        border-radius: 12px;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+      }
     </style>
   </head>
   <body>
     <div class="container modern-container mt-4">
       <div class="app-header">
         <div class="d-flex align-items-center">
-          <img src="{{ url_for('static', filename='img/MHO_Logo.jpg') }}"
-               alt="MHO Burauen Logo Placeholder"
-               class="mho-logo" />
+          <img
+            src="{{ url_for('static', filename='img/MHO_Logo.jpg') }}"
+            alt="MHO Burauen Logo Placeholder"
+            class="mho-logo"
+          />
           <div>
             <h1 class="mb-0">MHO Burauen Animal Bite Treatment Center</h1>
-            <div class="subtitle">PhilHealth CF1 / CF2 / CSF Document Viewer</div>
+            <div class="subtitle">
+              PhilHealth CF1 / CF2 / CSF Document Viewer
+            </div>
           </div>
         </div>
         <i class="fa-solid fa-dog header-icon-right"></i>
       </div>
       <div class="d-flex justify-content-between align-items-center mb-4">
-        <ul class="nav nav-pills" id="pdfTabNav">
-        </ul>
-        <button class="btn btn-back-modern mx-2" onclick="window.location.href = '/'">
+        <ul class="nav nav-pills" id="pdfTabNav"></ul>
+        <button
+          class="btn btn-back-modern mx-2"
+          onclick="window.location.href = '/'"
+        >
           <i class="fa-solid fa-arrow-left me-1"></i> Back
         </button>
       </div>
       <div class="tab-content mt-3" id="pdfTabContent"></div>
     </div>
-    <script>
-        // ====== Receive data from backend (DO NOT ALTER) ======
-        const pdfFiles = {{ pdf_files | tojson }};
 
-        // DOM elements
-        const tabNav = document.getElementById("pdfTabNav");
-        const tabContent = document.getElementById("pdfTabContent");
+    <style>
+      /* Base font and color */
+      #printArea {
+        font-family: Arial, sans-serif;
+        font-size: 11px;
+        color: #000;
+        line-height: 1.2;
+      }
 
-        // ====== Dynamically render the tabs ======
-        pdfFiles.forEach((file, index) => {
-            const tabId = `tab-${index}`;
-            const isActive = index === 0 ? "active" : "";
-            const isShown = index === 0 ? "show active" : "";
+      /* Headings */
+      h1,
+      h2,
+      h3 {
+        margin: 3px 0;
+        font-weight: bold;
+        text-align: center;
+      }
 
-            // --- Generate Tab Button ---
-            tabNav.innerHTML += `
-                <li class="nav-item" role="presentation">
-                    <button class="nav-link ${isActive}" id="${tabId}-tab" data-bs-toggle="tab" data-bs-target="#${tabId}" type="button" role="tab">
-                        ${file.name}
-                    </button>
-                </li>
-            `;
+      h2 {
+        font-size: 14px;
+      }
+      h3 {
+        font-size: 12px;
+      }
 
-            // --- Generate Tab Content ---
-            tabContent.innerHTML += `
-                <div class="tab-pane fade ${isShown}" id="${tabId}" role="tabpanel">
-            
-                    <iframe class="pdf-frame" src="${file.url}"></iframe>
-            
-                
-                </div>
-            `;
-        });
+      /* Paragraph */
+      p {
+        margin: 2px 0;
+        text-align: center;
+        font-size: 11px;
+      }
 
-        // ===== Print Function (DO NOT ALTER) =====
-        function printPDF(filePath) {
-            const printWin = window.open(filePath);
-            printWin.focus();
-            printWin.print();
+      /* Header layout */
+      .header-top {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+      }
+
+      .header-top img {
+        height: 60px;
+        width: auto;
+      }
+
+      .header-title {
+        flex: 1;
+        text-align: center;
+        font-size: 14px;
+      }
+
+      .header-ref {
+        text-align: right;
+        font-size: 12px;
+        margin-top: 25px;
+      }
+
+      /* Info section */
+      .info {
+        display: flex;
+        justify-content: space-between;
+        margin-top: 5px;
+      }
+
+      .info-column {
+        width: 50%;
+      }
+
+      .info-row {
+        display: flex;
+        margin-bottom: 3px;
+      }
+
+      .info-row strong {
+        width: 40%;
+        font-size: 11px;
+      }
+
+      .value {
+        width: 55%;
+        font-size: 11px;
+      }
+
+      .line-value {
+        display: block;
+        width: 100%;
+        border-bottom: 1px solid #000;
+        padding: 2px 0;
+        min-height: 16px; /* keeps line visible even if empty */
+      }
+      /* Tables */
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 5px;
+        font-size: 10px;
+      }
+
+      th,
+      td {
+        border: 1px solid #000;
+        padding: 3px;
+      }
+
+      th {
+        background: #f2f2f2;
+        font-size: 10px;
+        text-align: center;
+      }
+
+      .right {
+        text-align: right;
+      }
+
+      /* 🔥 Show ONLY when printing */
+      @media print {
+        body * {
+          visibility: hidden;
         }
+
+        #printArea,
+        #printArea * {
+          visibility: visible;
+        }
+
+        #printArea {
+          display: block;
+          position: absolute;
+          top: 0;
+          left: 0;
+          width: 100%;
+        }
+
+        .signature-section {
+          display: flex;
+          justify-content: space-between;
+          margin-top: 50px;
+        }
+
+        .signature-box {
+          width: 45%;
+          text-align: left;
+        }
+
+        .line {
+          border-bottom: 1px solid #000;
+          margin-top: 25px;
+          margin-bottom: 5px;
+        }
+
+        /* GRID LAYOUT */
+        .signature-details {
+          display: grid;
+          grid-template-columns: 1fr 1fr;
+          column-gap: 20px;
+          row-gap: 4px;
+          font-size: 11px;
+        }
+
+        .signature-details p {
+          margin: 0;
+          text-align: left;
+        }
+
+        /* FULL WIDTH (for name + signature label) */
+        .signature-details .full {
+          grid-column: 1 / -1;
+        }
+      }
+    </style>
+    <div style="display: none">
+      <div id="printArea">
+        <div style="margin-bottom: 3%">
+          <div class="header-top">
+            <img
+              src="{{ url_for('static', filename=header.leftLogo) }}"
+              alt="Left logo"
+            />
+            <h2 class="header-title">{{ header.title }}</h2>
+            <img
+              src="{{ url_for('static', filename=header.rightLogo) }}"
+              alt="Right logo"
+            />
+          </div>
+          <p class="header-ref">SOA Reference No: {{ header.refNo }}</p>
+          <h3>{{ header.facility }}</h3>
+          <h3>{{ header.location }}</h3>
+        </div>
+        <div class="info">
+          <div class="info-column">
+            {% for item in patient_info.left %}
+            <div class="info-row">
+              <strong>{{ item.label | safe }}:</strong>
+              <div class="value">
+                {% if item.value is iterable and item.value is not string %} {%
+                for val in item.value %}
+                <div class="line-value">{{ val }}</div>
+                {% endfor %} {% else %}
+                <div class="line-value">{{ item.value }}</div>
+                {% endif %}
+              </div>
+            </div>
+            {% endfor %}
+          </div>
+          <div class="info-column">
+            {% for item in patient_info.right %}
+            <div class="info-row">
+              <strong>{{ item.label }}:</strong>
+              <div class="value">
+                {% if item.value is iterable and item.value is not string %} {%
+                for val in item.value %}
+                <div class="line-value">{{ val }}</div>
+                {% endfor %} {% else %}
+                <div class="line-value">{{ item.value }}</div>
+                {% endif %}
+              </div>
+            </div>
+            {% endfor %}
+          </div>
+        </div>
+        <div>
+          <h3 class="my-3">Summary of Fees</h3>
+          <table>
+            <thead>
+              <tr>
+                <th>Fee Particulars</th>
+                <th style="width: 20%">Amount</th>
+                <th style="width: 15%">Mandatory Discount</th>
+                <th style="width: 15%">PhilHealth</th>
+                <th style="width: 15%">Other Funding Sources</th>
+                <th style="width: 15%">Balance</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for row in fee_summary %}
+              <tr>
+                <td>{{ row.label }}</td>
+                <td class="right">
+                  {% if row.amount is string %} {{ row.amount }} {% else %} {{
+                  "{:,.2f}".format(row.amount) }} {% endif %}
+                </td>
+                <td class="right">
+                  {% if row.discount is string %} {{ row.discount }} {% else %}
+                  {{ "{:,.2f}".format(row.discount) }} {% endif %}
+                </td>
+                <td class="right">{{ row.philhealth }}</td>
+                <td class="right">{{ row.otherFunding }}</td>
+                <td class="right">{{ row.balance }}</td>
+              </tr>
+              {% endfor %}
+              <tr>
+                <td><strong>Total</strong></td>
+                <td class="right">
+                  <strong
+                    >{{ "{:,.2f}".format(fee_summary|sum(attribute='amount') or
+                    0) }}</strong
+                  >
+                </td>
+                <td class="right">
+                  <strong
+                    >{{ "{:,.2f}".format(fee_summary|sum(attribute='discount')
+                    or 0) }}</strong
+                  >
+                </td>
+                <td class="right">
+                  <strong
+                    >{{ "{:,.2f}".format(fee_summary|selectattr('philhealth',
+                    'ne', '-')|sum(attribute='philhealth') or 0) }}</strong
+                  >
+                </td>
+                <td class="right">
+                  <strong
+                    >{{ "{:,.2f}".format(fee_summary|selectattr('otherFunding',
+                    'ne', '-')|sum(attribute='otherFunding') or 0) }}</strong
+                  >
+                </td>
+                <td class="right"><strong>0.00</strong></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div>
+          <h3 class="my-3">Professional Fees</h3>
+          <table>
+            <thead>
+              <tr>
+                <th style="width: 120px">Physician Accreditation Number</th>
+                <th>Physician Name</th>
+                <th>Amount</th>
+                <th>Discount</th>
+                <th>PhilHealth</th>
+                <th style="width: 100px">Other Funding Sources</th>
+                <th>Balance</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for row in professional_fees %}
+              <tr>
+                <td>{{ row.accreditation }}</td>
+                <td>{{ row.physician }}</td>
+                <td class="right">
+                  {{ "{:,.2f}".format(row.amount) if row.amount is number else
+                  row.amount }}
+                </td>
+                <td class="right">
+                  {{ "{:,.2f}".format(row.discount) if row.discount is number
+                  else row.discount }}
+                </td>
+                <td class="right">
+                  {{ "{:,.2f}".format(row.philhealth) if row.philhealth is
+                  number else row.philhealth }}
+                </td>
+                <td class="right">{{ row.otherFunding }}</td>
+                <td class="right">
+                  {{ "{:,.2f}".format(row.balance) if row.balance is number else
+                  row.balance }}
+                </td>
+              </tr>
+              {% endfor %}
+              <tr>
+                <td colspan="6"><strong>Total</strong></td>
+                <td class="right">
+                  <strong
+                    >{{
+                    "{:,.2f}".format(professional_fees|sum(attribute='balance')
+                    or 0) }}</strong
+                  >
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div>
+          <h3 class="my-3">Itemized Charges</h3>
+          <table>
+            <thead>
+              <tr>
+                <th style="width: 12%">Service Date</th>
+                <th style="width: 40%">Item name</th>
+                <th style="width: 15%">Unit of Measurement</th>
+                <th>Price</th>
+                <th>Quantity</th>
+                <th>Amount</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for row in itemized_charges %}
+              <tr>
+                <td>{{ row.date }}</td>
+                <td>{{ row.item }}</td>
+                <td>{{ row.unit }}</td>
+                <td class="right">
+                  {{ "{:,.2f}".format(row.price) if row.price is number else
+                  row.price }}
+                </td>
+                <td class="right">{{ row.qty }}</td>
+                <td class="right">
+                  {{ "{:,.2f}".format(row.amount) if row.amount is number else
+                  row.amount }}
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+        <div class="signature-section">
+          <!-- LEFT: PREPARED BY -->
+          <div class="signature-box">
+            <p style="text-align: left"><strong>Prepared by:</strong></p>
+            <div class="line"></div>
+
+            <div class="signature-details">
+              <div class="full">
+                <p>Billing Clerk/Accountant</p>
+                <p>(Signature over printed name)</p>
+              </div>
+
+              <p>Date Signed:</p>
+              <p>_______________</p>
+
+              <p>Contact No.:</p>
+              <p>_______________</p>
+            </div>
+          </div>
+
+          <!-- RIGHT: CONFORME -->
+          <div class="signature-box">
+            <p style="text-align: left"><strong>Conforme:</strong></p>
+            <div class="line"></div>
+
+            <div class="signature-details">
+              <div class="full">
+                <p>Patient/ Representative</p>
+                <p>(Signature over printed name)</p>
+              </div>
+
+              <p>Date Signed:</p>
+              <p>________________</p>
+
+              <p>Contact No.:</p>
+              <p>_______________</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- 
+    <script>
+      // ====== Receive data from backend (DO NOT ALTER) ======
+      const pdfFiles = {{ pdf_files | tojson }};
+
+      // DOM elements
+      const tabNav = document.getElementById("pdfTabNav");
+      const tabContent = document.getElementById("pdfTabContent");
+
+      // ====== Dynamically render the tabs ======
+      pdfFiles.forEach((file, index) => {
+          const tabId = `tab-${index}`;
+          const isActive = index === 0 ? "active" : "";
+          const isShown = index === 0 ? "show active" : "";
+
+          // --- Generate Tab Button ---
+          tabNav.innerHTML += `
+              <li class="nav-item" role="presentation">
+                  <button class="nav-link ${isActive}" id="${tabId}-tab" data-bs-toggle="tab" data-bs-target="#${tabId}" type="button" role="tab">
+                      ${file.name}
+                  </button>
+              </li>
+          `;
+
+          // --- Generate Tab Content ---
+          tabContent.innerHTML += `
+              <div class="tab-pane fade ${isShown}" id="${tabId}" role="tabpanel">
+
+                  <iframe class="pdf-frame" src="${file.url}"></iframe>
+
+
+              </div>
+          `;
+      });
+
+      // ===== Print Function (DO NOT ALTER) =====
+      function printPDF(filePath) {
+          const printWin = window.open(filePath);
+          printWin.focus();
+          printWin.print();
+      }
+    </script> -->
+    <script>
+            // ====== Receive data from backend (DO NOT ALTER) ======
+            const pdfFiles = {{ pdf_files | tojson }};
+
+            // DOM elements
+            const tabNav = document.getElementById("pdfTabNav");
+            const tabContent = document.getElementById("pdfTabContent");
+
+            // ====== Create SOA tab ======
+            tabNav.innerHTML += `
+              <li class="nav-item" role="presentation">
+                <button class="nav-link active" id="soa-tab-tab" data-bs-toggle="tab" data-bs-target="#soa-tab" type="button" role="tab">
+                  Statement of Account
+                </button>
+              </li>
+            `;
+
+            tabContent.innerHTML += `
+              <div class="tab-pane fade show active" id="soa-tab" role="tabpanel">
+                  <div class="d-flex justify-content-end mb-3">
+        <button class="btn btn-primary" id="printSOABtn">
+          <i class="fa-solid fa-print me-1"></i> Print SOA
+        </button>
+      </div>
+                ${document.getElementById('printArea').outerHTML}
+              </div>
+            `;
+
+            // ====== Create other PDF tabs dynamically ======
+            pdfFiles.forEach((file, index) => {
+              const tabId = `tab-${index}`;
+
+              tabNav.innerHTML += `
+                <li class="nav-item" role="presentation">
+                  <button class="nav-link" id="${tabId}-tab" data-bs-toggle="tab" data-bs-target="#${tabId}" type="button" role="tab">
+                    ${file.name}
+                  </button>
+                </li>
+              `;
+
+              tabContent.innerHTML += `
+                <div class="tab-pane fade" id="${tabId}" role="tabpanel">
+                  <iframe class="pdf-frame" src="${file.url}"></iframe>
+                </div>
+              `;
+            });
+
+            // ===== Print Function (DO NOT ALTER) =====
+            function printPDF(filePath) {
+                const printWin = window.open(filePath);
+                printWin.focus();
+                printWin.print();
+            }
+           document.getElementById('printSOABtn').addEventListener('click', function() {
+              window.print(); // only runs when button is clicked
+          });
     </script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
   </body>

@@ -1,0 +1,44 @@
+{
+  "header": {
+    "leftLogo": "img/DOH_Logo.png",
+    "rightLogo": "img/MHO_Logo.jpg",
+    "title": "Statement of Account",
+    "refNo": "7195-26033770967976",
+    "facility": "BURAEUN RURAL HEALTH UNIT",
+    "location": "POBLACION DISTRICT VII BURAUEN LEYTE"
+  },
+  "patientInfo": {
+    "left": [
+      {
+        "label": "Patient Name",
+        "value": "EMMAN SANTOS III"
+      },
+      {
+        "label": "Address",
+        "value": "POBLACION DISTRICT 3 BURAUEN, LEYTE"
+      },
+      {
+        "label": "Final Diagnosis (ICD-10/RVS)",
+        "value": "MCP01"
+      },
+      {
+        "label": "Other Diagnosis (ICD-10/RVS)",
+        "value": ["1. 90375", "2. Z37.0", "3. Z39.0"]
+      }
+    ],
+    "right": [
+      {
+        "label": "Age",
+        "value": "28 yrs 9 mos 2 days"
+      },
+      {
+        "label": "Date and Time Admitted",
+        "value": "Feb 23, 2026 07:22"
+      },
+      {
+        "label": "Date and Time Discharged",
+        "value": "Feb 24, 2026 10:35"
+      }
+    ]
+  }
+}

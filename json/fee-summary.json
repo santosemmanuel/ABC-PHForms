@@ -1,0 +1,50 @@
+[
+  {
+    "label": "Room and Board",
+    "amount": 0.0,
+    "discount": 0,
+    "philhealth": "-",
+    "otherFunding": "-",
+    "balance": "-"
+  },
+  {
+    "label": "Drugs and Medicines",
+    "amount": 4610.0,
+    "discount": 0,
+    "philhealth": "-",
+    "otherFunding": "-",
+    "balance": "-"
+  },
+  {
+    "label": "Laboratory and Diagnostics",
+    "amount": 0.0,
+    "discount": 0,
+    "philhealth": "-",
+    "otherFunding": "-",
+    "balance": "-"
+  },
+  {
+    "label": "Operating Room Fees",
+    "amount": 0.0,
+    "discount": 0,
+    "philhealth": "-",
+    "otherFunding": "-",
+    "balance": "-"
+  },
+  {
+    "label": "Medical Supplies",
+    "amount": 440.0,
+    "discount": 0,
+    "philhealth": "-",
+    "otherFunding": "-",
+    "balance": "-"
+  },
+  {
+    "label": "Others",
+    "amount": 300.0,
+    "discount": 0,
+    "philhealth": "-",
+    "otherFunding": "-",
+    "balance": "-"
+  }
+]

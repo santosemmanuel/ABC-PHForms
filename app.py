@@ -52,10 +52,22 @@ def view_print_pdf():
         {"name": "CF-1 Form", "url": "/static/pdfs/output_cf1.pdf"},
         {"name": "CF-2 Form", "url": "/static/pdfs/output_cf2.pdf"},
         {"name": "CSF Form", "url": "/static/pdfs/output_csf.pdf"},
-        {"name": "Statement of Account", "url": "/static/pdfs/output_soa.pdf"},
     ]
-    return render_template('viewPrintPDF.html', pdf_files=pdf_files)
+    statement = load_json(os.path.join(os.path.dirname(__file__), 'json', 'statement-data.json'))
+    fee_summary = load_json(os.path.join(os.path.dirname(__file__), 'json', 'fee-summary.json'))
+    professional_fees = load_json(os.path.join(os.path.dirname(__file__), 'json', 'professional-fees.json'))
+    itemized_charges = load_json(os.path.join(os.path.dirname(__file__), 'json', 'itemized-charges.json'))
+    return render_template('viewPrintPDF.html', pdf_files=pdf_files,  header=statement['header'],
+                         patient_info=statement['patientInfo'],
+                         fee_summary=fee_summary,
+                         professional_fees=professional_fees,
+                         itemized_charges=itemized_charges)
 
+
+def load_json(filename):
+    with open(filename, 'r') as f:
+        print()
+        return json.load(f)
 
 @app.route("/reports")
 def view_reports():
