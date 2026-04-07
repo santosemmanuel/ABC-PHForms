@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, jsonify, current_app
+from flask import Flask, render_template, request, jsonify, current_app, session
 from fillpdf import fillpdfs
 from pdfrw import PdfReader as PdfRwReader, PdfWriter as PdfRwWriter, PageMerge, PdfDict, PdfName
 from datetime import datetime, date, timedelta
@@ -10,7 +10,7 @@ from pdf_utils import clean_files
 
 # Initialize Flask app
 app = Flask(__name__)
-
+app.secret_key = "ABTC"
 # PdfWriter().write(output_pdf, pdf)
 
 # Send the filled PDF as a download
@@ -34,8 +34,8 @@ def submit_form():
     data = request.get_json()
     pretty_json_string = json.dumps(data, indent=4)
     patient_data = dict(data)
+    session['patient_data'] = patient_data
     print(pretty_json_string)
-
     clean_files(["output_cf1.pdf", "output_cf2.pdf", "output_csf.pdf", "output_soa.pdf"], current_app.root_path)
 
     fill_cf1(patient_data)
@@ -54,6 +54,16 @@ def view_print_pdf():
         {"name": "CSF Form", "url": "/static/pdfs/output_csf.pdf"},
     ]
     statement = load_json(os.path.join(os.path.dirname(__file__), 'json', 'statement-data.json'))
+    patient = session.get('patient_data', {})
+
+    patientName = " ".join(filter(None, [
+        patient.get('firstName'),
+        patient.get('middleName'),
+        patient.get('lastName'),
+        patient.get('nameExt')
+    ]))
+    statement["patientInfo"]['left'][0]['value'] = patientName
+    
     fee_summary = load_json(os.path.join(os.path.dirname(__file__), 'json', 'fee-summary.json'))
     professional_fees = load_json(os.path.join(os.path.dirname(__file__), 'json', 'professional-fees.json'))
     itemized_charges = load_json(os.path.join(os.path.dirname(__file__), 'json', 'itemized-charges.json'))
