@@ -19,11 +19,11 @@
       },
       {
         "label": "Final Diagnosis (ICD-10/RVS)",
-        "value": "MCP01"
+        "value": "90375"
       },
       {
         "label": "Other Diagnosis (ICD-10/RVS)",
-        "value": ["1. 90375", "2. Z37.0", "3. Z39.0"]
+        "value": ["1. T14.1", "2. W55", "3. "]
       }
     ],
     "right": [

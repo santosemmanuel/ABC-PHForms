@@ -62,8 +62,19 @@ def view_print_pdf():
         patient.get('lastName'),
         patient.get('nameExt')
     ]))
+
+    patientAddress = " ".join(filter(None, [
+        patient.get('barangay'),
+        patient.get('municipality') + ", Leyte",
+    ]))
+
     statement["patientInfo"]['left'][0]['value'] = patientName
-    
+    statement["patientInfo"]['left'][1]['value'] = patientAddress
+    statement["patientInfo"]['left'][2]['value'] = calculate_age(patient.get('dob', ''))
+    statement["patientInfo"]['right'][1]['value'] = format_datetime(patient.get('datetimeAdmitted', ''))
+    statement["patientInfo"]['right'][2]['value'] = format_datetime(patient.get('datetimeDischarged', ''))
+
+
     fee_summary = load_json(os.path.join(os.path.dirname(__file__), 'json', 'fee-summary.json'))
     professional_fees = load_json(os.path.join(os.path.dirname(__file__), 'json', 'professional-fees.json'))
     itemized_charges = load_json(os.path.join(os.path.dirname(__file__), 'json', 'itemized-charges.json'))
@@ -78,6 +89,42 @@ def load_json(filename):
     with open(filename, 'r') as f:
         print()
         return json.load(f)
+
+def calculate_age(date_str):
+    # Convert string to date object
+    year, month, day = map(int, date_str.split('-'))
+    birth_date = date(year, month, day)
+    today = date.today()
+
+    # Initial difference
+    years = today.year - birth_date.year
+    months = today.month - birth_date.month
+    days = today.day - birth_date.day
+
+    # Adjust if days are negative
+    if days < 0:
+        months -= 1
+        # Get days in previous month
+        prev_month = today.month - 1 if today.month > 1 else 12
+        prev_year = today.year if today.month > 1 else today.year - 1
+        
+        from calendar import monthrange
+        days += monthrange(prev_year, prev_month)[1]
+
+    # Adjust if months are negative
+    if months < 0:
+        years -= 1
+        months += 12
+
+    return f"{years} years {months} months {days} days"
+
+
+def format_datetime(dt_string):
+    # Convert string to datetime object
+    dt = datetime.strptime(dt_string, "%Y-%m-%dT%H:%M:%S")
+    
+    # Format to desired output
+    return dt.strftime("%B %d, %Y %H:%M:%S")
 
 @app.route("/reports")
 def view_reports():

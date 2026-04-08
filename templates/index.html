@@ -1,639 +1,817 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>MHO Burauen Claim Form</title>
-        <link href="{{ url_for('static', filename='css/bootstrap.min.css') }}"
-              rel="stylesheet">
-        <style>
-            /* * MHO BURAUEN HEALTH CARE UI STYLES 
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>MHO Burauen Claim Form</title>
+    <link
+      href="{{ url_for('static', filename='css/bootstrap.min.css') }}"
+      rel="stylesheet"
+    />
+    <style>
+      /* * MHO BURAUEN HEALTH CARE UI STYLES 
              */
-            :root {
-                --color-primary-green: #28a745; 
-                --color-dark-green: #1e7e34;
-                --color-light-green: #e9f5ed; 
-                --color-text-dark: #343a40;
-                --color-text-muted: #6c757d;
-                --color-border: #ced4da;
-            }
+      :root {
+        --color-primary-green: #28a745;
+        --color-dark-green: #1e7e34;
+        --color-light-green: #e9f5ed;
+        --color-text-dark: #343a40;
+        --color-text-muted: #6c757d;
+        --color-border: #ced4da;
+      }
 
-            body {
-                background: #f8f9fa;
-                font-family: 'Inter', sans-serif;
-                color: var(--color-text-dark);
-            }
+      body {
+        background: #f8f9fa;
+        font-family: "Inter", sans-serif;
+        color: var(--color-text-dark);
+      }
 
-            .modern-container {
-                max-width: 1200px;
-                margin: auto;
-            }
-            
-            /* --- Custom Header Style --- */
-            .app-header {
-                background: linear-gradient(to right, var(--color-primary-green), #4CAF50);
-                color: white;
-                padding: 15px 30px;
-                border-radius: 12px;
-                margin-bottom: 25px;
-                box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
-                display: flex;
-                align-items: center;
-                justify-content: space-between;
-            }
-            .app-header h1 {
-                font-size: 1.6rem;
-                font-weight: 700;
-                margin-bottom: 0;
-            }
-            .app-header .subtitle {
-                font-size: 0.95rem;
-                opacity: 0.9;
-                margin-top: 5px;
-            }
-            .mho-logo {
-                width: 50px;
-                height: 50px;
-                border-radius: 50%;
-                object-fit: cover;
-                margin-right: 15px;
-            }
-             .app-header .header-icon-right {
-                font-size: 2rem;
-                color: rgba(255, 255, 255, 0.8);
-             }
+      .modern-container {
+        max-width: 1200px;
+        margin: auto;
+      }
 
+      /* --- Custom Header Style --- */
+      .app-header {
+        background: linear-gradient(
+          to right,
+          var(--color-primary-green),
+          #4caf50
+        );
+        color: white;
+        padding: 15px 30px;
+        border-radius: 12px;
+        margin-bottom: 25px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+      }
+      .app-header h1 {
+        font-size: 1.6rem;
+        font-weight: 700;
+        margin-bottom: 0;
+      }
+      .app-header .subtitle {
+        font-size: 0.95rem;
+        opacity: 0.9;
+        margin-top: 5px;
+      }
+      .mho-logo {
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        object-fit: cover;
+        margin-right: 15px;
+      }
+      .app-header .header-icon-right {
+        font-size: 2rem;
+        color: rgba(255, 255, 255, 0.8);
+      }
 
-            /* Reduced vertical spacing utilities */
-            .mb-2-5 { margin-bottom: 0.6rem !important; }
+      /* Reduced vertical spacing utilities */
+      .mb-2-5 {
+        margin-bottom: 0.6rem !important;
+      }
 
-            .form-card {
-                border: 1px solid var(--color-light-green);
-                border-radius: 16px;
-                padding: 20px;
-                background: #ffffff;
-                box-shadow: 0 8px 20px rgba(0, 50, 10, 0.04);
-            }
+      .form-card {
+        border: 1px solid var(--color-light-green);
+        border-radius: 16px;
+        padding: 20px;
+        background: #ffffff;
+        box-shadow: 0 8px 20px rgba(0, 50, 10, 0.04);
+      }
 
-            .section-header {
-                font-size: 1.15rem;
-                font-weight: 700;
-                padding: 12px 20px;
-                border-radius: 12px 12px 0 0;
-                background: var(--color-primary-green);
-                color: white;
-                margin: -20px -20px 20px -20px;
-                display: flex;
-                align-items: center;
-            }
+      .section-header {
+        font-size: 1.15rem;
+        font-weight: 700;
+        padding: 12px 20px;
+        border-radius: 12px 12px 0 0;
+        background: var(--color-primary-green);
+        color: white;
+        margin: -20px -20px 20px -20px;
+        display: flex;
+        align-items: center;
+      }
 
-            .section-header i {
-                margin-right: 10px;
-                font-size: 1.25rem;
-            }
+      .section-header i {
+        margin-right: 10px;
+        font-size: 1.25rem;
+      }
 
-            .form-control, .form-select {
-                border-radius: 8px;
-                font-size: 0.85rem;
-                padding: 8px 10px !important;
-                height: 38px;
-                border: 1px solid var(--color-border);
-            }
+      .form-control,
+      .form-select {
+        border-radius: 8px;
+        font-size: 0.85rem;
+        padding: 8px 10px !important;
+        height: 38px;
+        border: 1px solid var(--color-border);
+      }
 
-            .form-control:focus, .form-select:focus {
-                border-color: var(--color-primary-green);
-                box-shadow: 0 0 0 0.25rem rgba(40, 167, 69, 0.25);
-            }
+      .form-control:focus,
+      .form-select:focus {
+        border-color: var(--color-primary-green);
+        box-shadow: 0 0 0 0.25rem rgba(40, 167, 69, 0.25);
+      }
 
-            .form-label {
-                font-size: 0.75rem;
-                font-weight: 600;
-                margin-bottom: 2px;
-                color: var(--color-text-muted);
-            }
-            
-            .group-title {
-                font-size: 0.95rem;
-                font-weight: 700;
-                color: var(--color-primary-green);
-                margin-top: 15px;
-                margin-bottom: 8px;
-                border-left: 3px solid var(--color-primary-green);
-                padding-left: 10px;
-                display: flex;
-                align-items: center;
-            }
-            .group-title i {
-                margin-right: 6px;
-                color: var(--color-text-dark);
-            }
-            
-            /* --- Submit Button Styling (Solid Fill) --- */
-            .btn-submit {
-                background-color: var(--color-primary-green);
-                border-color: var(--color-primary-green);
-                color: white; /* Ensure text is white */
-                font-weight: 600;
-                border-radius: 8px;
-                transition: background-color 0.2s;
-            }
-            .btn-submit:hover {
-                background-color: var(--color-dark-green);
-                border-color: var(--color-dark-green);
-                color: white;
-            }
-            
-            /* --- Custom Dependent/Member Toggle UI --- */
-            .custom-radio-container {
-                display: flex;
-                gap: 10px; 
-                margin-bottom: 15px;
-            }
-            .custom-radio-button {
-                flex-grow: 1;
-                text-align: center;
-                border: 1px solid var(--color-border);
-                border-radius: 8px;
-                padding: 8px;
-                cursor: pointer;
-                transition: all 0.2s;
-                background-color: #f0f2f5; 
-                font-weight: 500;
-                color: var(--color-text-dark);
-            }
-            .custom-radio-button:hover {
-                background-color: #e2e4e7;
-            }
-            .custom-radio-button input[type="radio"] {
-                display: none;
-            }
-            .custom-radio-button input[type="radio"]:checked + span {
-                background-color: var(--color-light-green); 
-                border-color: var(--color-primary-green);
-                box-shadow: 0 0 5px rgba(40, 167, 69, 0.3);
-                color: var(--color-primary-green);
-                font-weight: 700;
-            }
-            .custom-radio-button span {
-                display: block;
-                border-radius: 6px;
-                padding: 3px 0;
-                font-size: 0.85rem;
-            }
-            
-            /* Dependent Section Specific Padding Adjustment */
-            #dependentSection {
-                padding-top: 15px !important; 
-                padding-bottom: 5px !important;
-            }
+      .form-label {
+        font-size: 0.75rem;
+        font-weight: 600;
+        margin-bottom: 2px;
+        color: var(--color-text-muted);
+      }
 
-            /* Uppercase Inputs */
-            #philhealthForm input[type="text"],
-            #philhealthForm input[type="date"],
-            #philhealthForm select,
-            #philhealthForm textarea {
-                text-transform: uppercase;
-            }
-            #philhealthForm ::placeholder { text-transform: uppercase; }
-        </style>
-    </head>
-    <body>
-        <div class="container modern-container py-4">
-            <div class="app-header">
-                <div class="d-flex align-items-center">
-                    <img src="{{ url_for('static', filename='img/MHO_Logo.jpg') }}"
-                         alt="MHO Burauen Logo Placeholder"
-                         class="mho-logo" />
-                    <div>
-                        <h1 class="mb-0">MHO Burauen Animal Bite Treatment Center</h1>
-                        <div class="subtitle">PhilHealth CF1 / CF2 / CSF Claim Form</div>
-                    </div>
-                </div>
-                <i class="fa-solid fa-dog header-icon-right"></i>
-            </div>
-            <form id="philhealthForm" class="needs-validation" novalidate>
-                <div class="row g-4">
-                    <div class="col-lg-7">
-                        <div class="form-card h-100">
-                            <div class="section-header">
-                                <i class="fa-solid fa-id-card"></i> Part I — Member Information
-                            </div>
-                            <div class="row g-2">
-                                <div class="col-md-4 mb-2-5">
-                                    <label class="form-label">PIN</label>
-                                    <input type="text" class="form-control" name="pin" required>
-                                </div>
-                                <div class="col-md-8 mb-2-5">
-                                    <label class="form-label">Last Name</label>
-                                    <input type="text" class="form-control" name="lastName" required>
-                                </div>
-                                <div class="col-md-6 mb-2-5">
-                                    <label class="form-label">First Name</label>
-                                    <input type="text" class="form-control" name="firstName" required>
-                                </div>
-                                <div class="col-md-4 mb-2-5">
-                                    <label class="form-label">Middle Name</label>
-                                    <input type="text" class="form-control" name="middleName">
-                                </div>
-                                <div class="col-md-2 mb-2-5">
-                                    <label class="form-label">Ext.</label>
-                                    <select class="form-select" name="nameExt">
-                                        <option value="">N/A</option>
-                                        <option>Jr.</option>
-                                        <option>Sr.</option>
-                                        <option>II</option>
-                                        <option>III</option>
-                                        <option>IV</option>
-                                    </select>
-                                </div>
-                                <div class="col-md-4 mb-2-5">
-                                    <label class="form-label">Date of Birth</label>
-                                    <input type="date" class="form-control" name="dob" required>
-                                </div>
-                                <div class="col-md-3 mb-2-5">
-                                    <label class="form-label">Sex</label>
-                                    <select class="form-select" name="sex" required>
-                                        <option value="">Sel...</option>
-                                        <option>Male</option>
-                                        <option>Female</option>
-                                    </select>
-                                </div>
-                            </div>
-                            <div class="col-12">
-                                <div class="group-title">Address Details</div>
-                            </div>
-                            <div class="row g-2">
-                                <div class="col-md-6 mb-2-5">
-                                    <input class="form-control"
-                                           name="street"
-                                           placeholder="Street / Subdivision / Village">
-                                </div>
-                                <div class="col-md-6 mb-2-5">
-                                    <select class="form-select" id="municipality" name="municipality" required>
-                                        <option value="">Choose Municipality...</option>
-                                    </select>
-                                </div>
-                                <div class="col-md-6 mb-2-5">
-                                    <select class="form-select" name="barangay" id="barangay" required>
-                                        <option value="">Choose barangay...</option>
-                                    </select>
-                                </div>
-                            </div>
-                            <div class="col-12">
-                                <div class="group-title">Contact Information</div>
-                            </div>
-                            <div class="row g-2">
-                                <div class="col-md-6 mb-2-5">
-                                    <input class="form-control"
-                                           name="mobile"
-                                           placeholder="Mobile No. (e.g., 09xxxxxxxxx)">
-                                </div>
-                                <div class="col-md-6 mb-2-5">
-                                    <input class="form-control" name="email" placeholder="Email Address">
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-lg-5">
-                        <div class="form-card mb-4">
-                            <div class="section-header">
-                                <i class="fa-solid fa-hospital-user"></i> Part II — Patient Information
-                            </div>
-                            <label class="form-label fw-bold">Is the patient the member?</label>
-                            <div class="custom-radio-container" id="patientIsMemberToggle">
-                                <label class="custom-radio-button">
-                                    <input type="radio" name="patientIsMember" value="yes" checked>
-                                    <span><i class="fa-solid fa-user me-1"></i> Self</span>
-                                </label>
-                                <label class="custom-radio-button">
-                                    <input type="radio" name="patientIsMember" value="no">
-                                    <span><i class="fa-solid fa-users me-1"></i> Dependent</span>
-                                </label>
-                            </div>
-                            <div id="dependentSection"
-                                 class="row g-2 d-none p-3 border rounded bg-light">
-                                <div class="col-12">
-                                    <div class="group-title mt-0 text-dark">
-                                        <i class="fa-solid fa-child"></i> Dependent Info
-                                    </div>
-                                </div>
-                                <div class="col-md-12 mb-2-5">
-                                    <label class="form-label">Dependent PIN</label>
-                                    <input type="text" class="form-control" name="depPin">
-                                </div>
-                                <div class="col-md-6 mb-2-5">
-                                    <input class="form-control" name="depLname" placeholder="Last Name">
-                                </div>
-                                <div class="col-md-6 mb-2-5">
-                                    <input class="form-control" name="depFname" placeholder="First Name">
-                                </div>
-                                <div class="col-md-4 mb-2-5">
-                                    <input class="form-control" name="depMname" placeholder="Middle Name">
-                                </div>
-                                <div class="col-md-4 mb-2-5">
-                                    <select class="form-select" name="depExt">
-                                        <option value="">Ext</option>
-                                        <option>Jr.</option>
-                                        <option>Sr.</option>
-                                        <option>II</option>
-                                        <option>III</option>
-                                        <option>IV</option>
-                                    </select>
-                                </div>
-                                <div class="col-md-4 mb-2-5">
-                                    <select class="form-select" name="depSex">
-                                        <option>Male</option>
-                                        <option>Female</option>
-                                    </select>
-                                </div>
-                                <div class="col-md-6 mb-2-5">
-                                    <label class="form-label">D.O.B</label>
-                                    <input type="date" class="form-control" name="depDob">
-                                </div>
-                                <div class="col-md-6 mb-2-5">
-                                    <label class="form-label">Relationship to Member</label>
-                                    <select class="form-select" name="relationship">
-                                        <option>Child</option>
-                                        <option>Parent</option>
-                                        <option>Spouse</option>
-                                    </select>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="form-card mb-4">
-                            <div class="section-header">
-                                <i class="fa-solid fa-clipboard-check"></i> Part III — Certification & Disposition
-                            </div>
-                            <div class="row">
-                                <div class="col-md-6">
-                                    <label class="form-label fw-bold">Form Signee</label>
-                                    <div class="form-check">
-                                        <input type="radio"
-                                               id="radioMember"
-                                               name="signee"
-                                               class="form-check-input"
-                                               value="member"
-                                               checked>
-                                        <label class="form-check-label" for="radioMember">Member</label>
-                                    </div>
-                                    <div class="form-check">
-                                        <input type="radio"
-                                               id="radioRep"
-                                               name="signee"
-                                               class="form-check-input"
-                                               value="representative">
-                                        <label class="form-check-label" for="radioRep">Representative</label>
-                                    </div>
-                                </div>
-                                <div class="col-md-6">
-                                    <label class="form-label fw-bold">CF2 — Patient Disposition</label>
-                                    <select class="form-select" name="patientDisposition" required>
-                                        <option value="">Select Disposition</option>
-                                        <option value="Improved">Improved</option>
-                                        <option value="Recovered">Recovered</option>
-                                        <option value="HomeDischarged">Home / Discharged AMA</option>
-                                        <option value="Absconded">Absconded</option>
-                                        <option value="Expired">Expired</option>
-                                        <option value="Transferred">Transferred / Referred</option>
-                                    </select>
-                                </div>
-                            </div>
-                            <div id="representativeSection"
-                                 class="row g-2 d-none p-3 border rounded bg-light mt-3">
-                                <div class="col-12">
-                                    <div class="group-title mt-0 text-dark">Representative Details</div>
-                                </div>
-                                <div class="col-md-12 mb-2-5">
-                                    <input class="form-control"
-                                           name="repName"
-                                           placeholder="Representative Full Name">
-                                </div>
-                                <div class="col-md-6 mb-2-5">
-                                    <select class="form-select" name="repRelationship">
-                                        <option value="">Relationship</option>
-                                        <option>Spouse</option>
-                                        <option>Child</option>
-                                        <option>Parent</option>
-                                        <option>Sibling</option>
-                                        <option>Others</option>
-                                    </select>
-                                </div>
-                                <div class="col-md-6 mb-2-5">
-                                    <select class="form-select" name="repReason">
-                                        <option value="">Reason for Representation</option>
-                                        <option>Member is incapacitated</option>
-                                        <option>Others</option>
-                                    </select>
-                                </div>
-                            </div>
-                        </div>
-                        <button type="submit" class="btn btn-submit w-100 py-3 fs-5 mt-2">
-                    <i class="fa-solid fa-paper-plane me-2"></i> SUBMIT CLAIM FORM
-                </button>
-                    </div>
-                </div>
-                
-            </form>
+      .group-title {
+        font-size: 0.95rem;
+        font-weight: 700;
+        color: var(--color-primary-green);
+        margin-top: 15px;
+        margin-bottom: 8px;
+        border-left: 3px solid var(--color-primary-green);
+        padding-left: 10px;
+        display: flex;
+        align-items: center;
+      }
+      .group-title i {
+        margin-right: 6px;
+        color: var(--color-text-dark);
+      }
+
+      /* --- Submit Button Styling (Solid Fill) --- */
+      .btn-submit {
+        background-color: var(--color-primary-green);
+        border-color: var(--color-primary-green);
+        color: white; /* Ensure text is white */
+        font-weight: 600;
+        border-radius: 8px;
+        transition: background-color 0.2s;
+      }
+      .btn-submit:hover {
+        background-color: var(--color-dark-green);
+        border-color: var(--color-dark-green);
+        color: white;
+      }
+
+      /* --- Custom Dependent/Member Toggle UI --- */
+      .custom-radio-container {
+        display: flex;
+        gap: 10px;
+        margin-bottom: 15px;
+      }
+      .custom-radio-button {
+        flex-grow: 1;
+        text-align: center;
+        border: 1px solid var(--color-border);
+        border-radius: 8px;
+        padding: 8px;
+        cursor: pointer;
+        transition: all 0.2s;
+        background-color: #f0f2f5;
+        font-weight: 500;
+        color: var(--color-text-dark);
+      }
+      .custom-radio-button:hover {
+        background-color: #e2e4e7;
+      }
+      .custom-radio-button input[type="radio"] {
+        display: none;
+      }
+      .custom-radio-button input[type="radio"]:checked + span {
+        background-color: var(--color-light-green);
+        border-color: var(--color-primary-green);
+        box-shadow: 0 0 5px rgba(40, 167, 69, 0.3);
+        color: var(--color-primary-green);
+        font-weight: 700;
+      }
+      .custom-radio-button span {
+        display: block;
+        border-radius: 6px;
+        padding: 3px 0;
+        font-size: 0.85rem;
+      }
+
+      /* Dependent Section Specific Padding Adjustment */
+      #dependentSection {
+        padding-top: 15px !important;
+        padding-bottom: 5px !important;
+      }
+
+      /* Uppercase Inputs */
+      #philhealthForm input[type="text"],
+      #philhealthForm input[type="date"],
+      #philhealthForm select,
+      #philhealthForm textarea {
+        text-transform: uppercase;
+      }
+      #philhealthForm ::placeholder {
+        text-transform: uppercase;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container modern-container py-4">
+      <div class="app-header">
+        <div class="d-flex align-items-center">
+          <img
+            src="{{ url_for('static', filename='img/MHO_Logo.jpg') }}"
+            alt="MHO Burauen Logo Placeholder"
+            class="mho-logo"
+          />
+          <div>
+            <h1 class="mb-0">MHO Burauen Animal Bite Treatment Center</h1>
+            <div class="subtitle">PhilHealth CF1 / CF2 / CSF Claim Form</div>
+          </div>
         </div>
-        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
-                integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
-                crossorigin="anonymous"></script>
-        <script>
-            // Utility function to toggle required attributes
-            function toggleRequired(selector, isRequired) {
-                const elements = document.querySelectorAll(selector);
-                elements.forEach(input => {
-                    if (isRequired) {
-                        input.setAttribute("required", "");
-                    } else {
-                        input.removeAttribute("required");
+        <i class="fa-solid fa-dog header-icon-right"></i>
+      </div>
+      <form id="philhealthForm" class="needs-validation" novalidate>
+        <div class="row g-4">
+          <div class="col-lg-7">
+            <div class="form-card h-100">
+              <div class="section-header">
+                <i class="fa-solid fa-id-card"></i> Part I — Member Information
+              </div>
+              <div class="row g-2">
+                <div class="col-md-4 mb-2-5">
+                  <label class="form-label">PIN</label>
+                  <input type="text" class="form-control" name="pin" required />
+                </div>
+                <div class="col-md-8 mb-2-5">
+                  <label class="form-label">Last Name</label>
+                  <input
+                    type="text"
+                    class="form-control"
+                    name="lastName"
+                    required
+                  />
+                </div>
+                <div class="col-md-6 mb-2-5">
+                  <label class="form-label">First Name</label>
+                  <input
+                    type="text"
+                    class="form-control"
+                    name="firstName"
+                    required
+                  />
+                </div>
+                <div class="col-md-4 mb-2-5">
+                  <label class="form-label">Middle Name</label>
+                  <input type="text" class="form-control" name="middleName" />
+                </div>
+                <div class="col-md-2 mb-2-5">
+                  <label class="form-label">Ext.</label>
+                  <select class="form-select" name="nameExt">
+                    <option value="">N/A</option>
+                    <option>Jr.</option>
+                    <option>Sr.</option>
+                    <option>II</option>
+                    <option>III</option>
+                    <option>IV</option>
+                  </select>
+                </div>
+                <div class="col-md-4 mb-2-5">
+                  <label class="form-label">Date of Birth</label>
+                  <input type="date" class="form-control" name="dob" required />
+                </div>
+                <div class="col-md-3 mb-2-5">
+                  <label class="form-label">Sex</label>
+                  <select class="form-select" name="sex" required>
+                    <option value="">Sel...</option>
+                    <option>Male</option>
+                    <option>Female</option>
+                  </select>
+                </div>
+              </div>
+              <div class="col-12">
+                <div class="group-title">Address Details</div>
+              </div>
+              <div class="row g-2">
+                <div class="col-md-6 mb-2-5">
+                  <input
+                    class="form-control"
+                    name="street"
+                    placeholder="Street / Subdivision / Village"
+                  />
+                </div>
+                <div class="col-md-6 mb-2-5">
+                  <select
+                    class="form-select"
+                    id="municipality"
+                    name="municipality"
+                    required
+                  >
+                    <option value="">Choose Municipality...</option>
+                  </select>
+                </div>
+                <div class="col-md-6 mb-2-5">
+                  <select
+                    class="form-select"
+                    name="barangay"
+                    id="barangay"
+                    required
+                  >
+                    <option value="">Choose barangay...</option>
+                  </select>
+                </div>
+              </div>
+              <div class="col-12">
+                <div class="group-title">Contact Information</div>
+              </div>
+              <div class="row g-2">
+                <div class="col-md-6 mb-2-5">
+                  <input
+                    class="form-control"
+                    name="mobile"
+                    placeholder="Mobile No. (e.g., 09xxxxxxxxx)"
+                  />
+                </div>
+                <div class="col-md-6 mb-2-5">
+                  <input
+                    class="form-control"
+                    name="email"
+                    placeholder="Email Address"
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="col-lg-5">
+            <div class="form-card mb-4">
+              <div class="section-header">
+                <i class="fa-solid fa-hospital-user"></i> Part II — Patient
+                Information
+              </div>
+              <label class="form-label fw-bold"
+                >Is the patient the member?</label
+              >
+              <div class="custom-radio-container" id="patientIsMemberToggle">
+                <label class="custom-radio-button">
+                  <input
+                    type="radio"
+                    name="patientIsMember"
+                    value="yes"
+                    checked
+                  />
+                  <span><i class="fa-solid fa-user me-1"></i> Self</span>
+                </label>
+                <label class="custom-radio-button">
+                  <input type="radio" name="patientIsMember" value="no" />
+                  <span><i class="fa-solid fa-users me-1"></i> Dependent</span>
+                </label>
+              </div>
+              <div
+                id="dependentSection"
+                class="row g-2 d-none p-3 border rounded bg-light"
+              >
+                <div class="col-12">
+                  <div class="group-title mt-0 text-dark">
+                    <i class="fa-solid fa-child"></i> Dependent Info
+                  </div>
+                </div>
+                <div class="col-md-12 mb-2-5">
+                  <label class="form-label">Dependent PIN</label>
+                  <input type="text" class="form-control" name="depPin" />
+                </div>
+                <div class="col-md-6 mb-2-5">
+                  <input
+                    class="form-control"
+                    name="depLname"
+                    placeholder="Last Name"
+                  />
+                </div>
+                <div class="col-md-6 mb-2-5">
+                  <input
+                    class="form-control"
+                    name="depFname"
+                    placeholder="First Name"
+                  />
+                </div>
+                <div class="col-md-4 mb-2-5">
+                  <input
+                    class="form-control"
+                    name="depMname"
+                    placeholder="Middle Name"
+                  />
+                </div>
+                <div class="col-md-4 mb-2-5">
+                  <select class="form-select" name="depExt">
+                    <option value="">Ext</option>
+                    <option>Jr.</option>
+                    <option>Sr.</option>
+                    <option>II</option>
+                    <option>III</option>
+                    <option>IV</option>
+                  </select>
+                </div>
+                <div class="col-md-4 mb-2-5">
+                  <select class="form-select" name="depSex">
+                    <option>Male</option>
+                    <option>Female</option>
+                  </select>
+                </div>
+                <div class="col-md-6 mb-2-5">
+                  <label class="form-label">D.O.B</label>
+                  <input type="date" class="form-control" name="depDob" />
+                </div>
+                <div class="col-md-6 mb-2-5">
+                  <label class="form-label">Relationship to Member</label>
+                  <select class="form-select" name="relationship">
+                    <option>Child</option>
+                    <option>Parent</option>
+                    <option>Spouse</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+            <div class="form-card mb-4">
+              <div class="section-header">
+                <i class="fa-solid fa-clipboard-check"></i> Part III —
+                Certification & Disposition
+              </div>
+              <div class="row">
+                <div class="col-md-6">
+                  <label class="form-label fw-bold">Form Signee</label>
+                  <div class="form-check">
+                    <input
+                      type="radio"
+                      id="radioMember"
+                      name="signee"
+                      class="form-check-input"
+                      value="member"
+                      checked
+                    />
+                    <label class="form-check-label" for="radioMember"
+                      >Member</label
+                    >
+                  </div>
+                  <div class="form-check">
+                    <input
+                      type="radio"
+                      id="radioRep"
+                      name="signee"
+                      class="form-check-input"
+                      value="representative"
+                    />
+                    <label class="form-check-label" for="radioRep"
+                      >Representative</label
+                    >
+                  </div>
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label fw-bold"
+                    >CF2 — Patient Disposition</label
+                  >
+                  <select
+                    class="form-select"
+                    name="patientDisposition"
+                    required
+                  >
+                    <option value="">Select Disposition</option>
+                    <option value="Improved">Improved</option>
+                    <option value="Recovered">Recovered</option>
+                    <option value="HomeDischarged">
+                      Home / Discharged AMA
+                    </option>
+                    <option value="Absconded">Absconded</option>
+                    <option value="Expired">Expired</option>
+                    <option value="Transferred">Transferred / Referred</option>
+                  </select>
+                </div>
+              </div>
+              <div
+                id="representativeSection"
+                class="row g-2 d-none p-3 border rounded bg-light mt-3"
+              >
+                <div class="col-12">
+                  <div class="group-title mt-0 text-dark">
+                    Representative Details
+                  </div>
+                </div>
+                <div class="col-md-12 mb-2-5">
+                  <input
+                    class="form-control"
+                    name="repName"
+                    placeholder="Representative Full Name"
+                  />
+                </div>
+                <div class="col-md-6 mb-2-5">
+                  <select class="form-select" name="repRelationship">
+                    <option value="">Relationship</option>
+                    <option>Spouse</option>
+                    <option>Child</option>
+                    <option>Parent</option>
+                    <option>Sibling</option>
+                    <option>Others</option>
+                  </select>
+                </div>
+                <div class="col-md-6 mb-2-5">
+                  <select class="form-select" name="repReason">
+                    <option value="">Reason for Representation</option>
+                    <option>Member is incapacitated</option>
+                    <option>Others</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+            <div class="form-card mb-4">
+              <div class="section-header">
+                <i class="fa-solid fa-clipboard-check"></i> Part IV — Admission
+                & Discharge Details
+              </div>
+              <div class="row">
+                    <div class="mt-1 mx-1 mb-3">
+                    <label>Date & Time Admitted:</label>
+                    <input
+                        type="datetime-local"
+                        class="form-control"
+                        name="datetimeAdmitted"
+                        step="1"
+                    />
+                  </div>
+                  <div class="m-1 mt-1 mx-1 mb-3">
+                  <label>Date & Time Discharged:</label>
+                  <input
+                    type="datetime-local"
+                    class="form-control"
+                    name="datetimeDischarged"
+                    step="1"
+                  />
+                  </div>
+                </form>
+              </div>
+              <div
+                id="representativeSection"
+                class="row g-2 d-none p-3 border rounded bg-light mt-3"
+              >
+                <div class="col-12">
+                  <div class="group-title mt-0 text-dark">
+                    Representative Details
+                  </div>
+                </div>
+                <div class="col-md-12 mb-2-5">
+                  <input
+                    class="form-control"
+                    name="repName"
+                    placeholder="Representative Full Name"
+                  />
+                </div>
+                <div class="col-md-6 mb-2-5">
+                  <select class="form-select" name="repRelationship">
+                    <option value="">Relationship</option>
+                    <option>Spouse</option>
+                    <option>Child</option>
+                    <option>Parent</option>
+                    <option>Sibling</option>
+                    <option>Others</option>
+                  </select>
+                </div>
+                <div class="col-md-6 mb-2-5">
+                  <select class="form-select" name="repReason">
+                    <option value="">Reason for Representation</option>
+                    <option>Member is incapacitated</option>
+                    <option>Others</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+            <button type="submit" class="btn btn-submit w-100 py-3 fs-5 mt-2">
+              <i class="fa-solid fa-paper-plane me-2"></i> SUBMIT CLAIM FORM
+            </button>
+          </div>
+        </div>
+      </form>
+    </div>
+    <script
+      src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+      integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
+      crossorigin="anonymous"
+    ></script>
+    <script>
+      // Utility function to toggle required attributes
+      function toggleRequired(selector, isRequired) {
+        const elements = document.querySelectorAll(selector);
+        elements.forEach((input) => {
+          if (isRequired) {
+            input.setAttribute("required", "");
+          } else {
+            input.removeAttribute("required");
+          }
+        });
+      }
+
+      // Dependent Section Logic (Updated for Radio Buttons)
+      const patientIsMemberRadios = document.querySelectorAll(
+        'input[name="patientIsMember"]',
+      );
+      const dependentSection = document.getElementById("dependentSection");
+      const dependentSelector =
+        "#dependentSection input, #dependentSection select";
+
+      patientIsMemberRadios.forEach((radio) => {
+        radio.addEventListener("change", function () {
+          const isDependent = this.value === "no";
+          dependentSection.classList.toggle("d-none", !isDependent);
+          // Only make Name and Relationship required if dependent section is visible
+          const requiredDependentFields =
+            "#dependentSection input[name$='name'], #dependentSection select[name='relationship']";
+          toggleRequired(requiredDependentFields, isDependent);
+
+          // Optional fields (like PIN, DOB) should not be forcibly required
+        });
+      });
+
+      // Representative Section Logic
+      const radioMember = document.getElementById("radioMember");
+      const radioRep = document.getElementById("radioRep");
+      const repSection = document.getElementById("representativeSection");
+      const repSelector =
+        "#representativeSection input, #representativeSection select";
+
+      function updateRepresentativeSection() {
+        const isRep = radioRep.checked;
+        repSection.classList.toggle("d-none", !isRep);
+        toggleRequired(repSelector, isRep);
+      }
+
+      radioMember.addEventListener("change", updateRepresentativeSection);
+      radioRep.addEventListener("change", updateRepresentativeSection);
+
+      // Uppercase Input Logic
+      const allTextInputs = document.querySelectorAll(
+        "#philhealthForm input[type='text']",
+      );
+      allTextInputs.forEach((input) => {
+        input.addEventListener("input", function () {
+          this.value = this.value.toUpperCase();
+        });
+      });
+
+      // Submission Logic (using Bootstrap's validation class)
+      (function () {
+        "use strict";
+        const form = document.getElementById("philhealthForm");
+
+        form.addEventListener(
+          "submit",
+          async function (event) {
+            // Prevent default submission behavior
+            event.preventDefault();
+            event.stopPropagation();
+
+            // Check if the form is valid according to HTML5/Bootstrap validation
+            if (!form.checkValidity()) {
+              form.classList.add("was-validated");
+              return; // Stop if validation fails
+            }
+
+            // --- Form is valid, proceed with data collection and submission ---
+
+            const patientIsMemberValue = document.querySelector(
+              'input[name="patientIsMember"]:checked',
+            ).value;
+
+            const data = {
+              pin: form.pin.value,
+              lastName: form.lastName.value,
+              firstName: form.firstName.value,
+              nameExt: form.nameExt.value,
+              middleName: form.middleName.value,
+              dob: form.dob.value,
+              sex: form.sex.value,
+              street: form.street.value,
+              barangay: form.barangay.value,
+              municipality: form.municipality.value,
+              mobile: form.mobile.value,
+              email: form.email.value,
+              patientIsMember: patientIsMemberValue,
+              dependent:
+                patientIsMemberValue === "no"
+                  ? {
+                      depPin: form.depPin.value,
+                      depLname: form.depLname.value,
+                      depFname: form.depFname.value,
+                      depMname: form.depMname.value,
+                      depDob: form.depDob.value,
+                      depSex: form.depSex.value,
+                      depExt: form.depExt.value,
+                      relationship: form.relationship.value,
                     }
-                });
-            }
+                  : null,
+              signee: form.signee.value,
+              representative:
+                form.signee.value === "representative"
+                  ? {
+                      repName: form.repName.value,
+                      repRelationship: form.repRelationship.value,
+                      repReason: form.repReason.value,
+                    }
+                  : null,
+              patientDisposition:
+                form.querySelector("select[name='patientDisposition']")
+                  ?.value || "",
+                datetimeAdmitted: form.datetimeAdmitted.value,
+                datetimeDischarged: form.datetimeDischarged.value,
+            };
 
-            // Dependent Section Logic (Updated for Radio Buttons)
-            const patientIsMemberRadios = document.querySelectorAll('input[name="patientIsMember"]');
-            const dependentSection = document.getElementById("dependentSection");
-            const dependentSelector = "#dependentSection input, #dependentSection select";
+            // ** NEW SUBMISSION VIA FETCH API TO /submit_form **
+            try {
+              console.log("Attempting to submit data to /submit_form:", data);
 
-            patientIsMemberRadios.forEach(radio => {
-                radio.addEventListener("change", function() {
-                    const isDependent = this.value === "no";
-                    dependentSection.classList.toggle("d-none", !isDependent);
-                    // Only make Name and Relationship required if dependent section is visible
-                    const requiredDependentFields = "#dependentSection input[name$='name'], #dependentSection select[name='relationship']";
-                    toggleRequired(requiredDependentFields, isDependent);
-
-                    // Optional fields (like PIN, DOB) should not be forcibly required
-                });
-            });
-            
-            // Representative Section Logic
-            const radioMember = document.getElementById("radioMember");
-            const radioRep = document.getElementById("radioRep");
-            const repSection = document.getElementById("representativeSection");
-            const repSelector = "#representativeSection input, #representativeSection select";
-
-            function updateRepresentativeSection() {
-                const isRep = radioRep.checked;
-                repSection.classList.toggle("d-none", !isRep);
-                toggleRequired(repSelector, isRep);
-            }
-
-            radioMember.addEventListener("change", updateRepresentativeSection);
-            radioRep.addEventListener("change", updateRepresentativeSection);
-
-            // Uppercase Input Logic
-            const allTextInputs = document.querySelectorAll("#philhealthForm input[type='text']");
-            allTextInputs.forEach(input => {
-                input.addEventListener("input", function() {
-                    this.value = this.value.toUpperCase();
-                });
-            });
-
-            // Submission Logic (using Bootstrap's validation class)
-            (function () {
-    'use strict'
-    const form = document.getElementById('philhealthForm')
-    
-    form.addEventListener('submit', async function (event) {
-        // Prevent default submission behavior
-        event.preventDefault()
-        event.stopPropagation()
-
-        // Check if the form is valid according to HTML5/Bootstrap validation
-        if (!form.checkValidity()) {
-            form.classList.add('was-validated');
-            return; // Stop if validation fails
-        }
-        
-        // --- Form is valid, proceed with data collection and submission ---
-
-        const patientIsMemberValue = document.querySelector('input[name="patientIsMember"]:checked').value;
-
-        const data = {
-            pin: form.pin.value,
-            lastName: form.lastName.value,
-            firstName: form.firstName.value,
-            nameExt: form.nameExt.value,
-            middleName: form.middleName.value,
-            dob: form.dob.value,
-            sex: form.sex.value,
-            street: form.street.value,
-            barangay: form.barangay.value,
-            municipality: form.municipality.value,
-            mobile: form.mobile.value,
-            email: form.email.value,
-            patientIsMember: patientIsMemberValue,
-            dependent: patientIsMemberValue === "no" ? {
-                depPin: form.depPin.value,
-                depLname: form.depLname.value,
-                depFname: form.depFname.value,
-                depMname: form.depMname.value,
-                depDob: form.depDob.value,
-                depSex: form.depSex.value,
-                depExt: form.depExt.value,
-                relationship: form.relationship.value
-            } : null,
-            signee: form.signee.value,
-            representative: form.signee.value === "representative" ? {
-                repName: form.repName.value,
-                repRelationship: form.repRelationship.value,
-                repReason: form.repReason.value
-            } : null,
-            patientDisposition: form.querySelector("select[name='patientDisposition']")?.value || ""
-        };
-        
-        // ** NEW SUBMISSION VIA FETCH API TO /submit_form **
-        try {
-            console.log("Attempting to submit data to /submit_form:", data);
-            
-            const response = await fetch('/submit_form', {
-                method: 'POST',
+              const response = await fetch("/submit_form", {
+                method: "POST",
                 headers: {
-                    'Content-Type': 'application/json'
+                  "Content-Type": "application/json",
                 },
                 // Convert the JavaScript object to a JSON string
-                body: JSON.stringify(data)
-            });
+                body: JSON.stringify(data),
+              });
 
-            if (response.ok) {
+              if (response.ok) {
                 // Submission was successful (e.g., status 200-299)
                 alert("✅ MHO Burauen Form submitted successfully!");
-                window.location.href = '/view_print';
+                window.location.href = "/view_print";
                 form.reset(); // Clear the form fields
-                form.classList.remove('was-validated'); // Remove validation state
-            } else {
+                form.classList.remove("was-validated"); // Remove validation state
+              } else {
                 // Submission failed on the server side (e.g., status 400 or 500)
                 const errorText = await response.text();
                 console.error("Submission failed:", errorText);
-                alert(`⚠️ Submission failed. Server responded with status: ${response.status}`);
+                alert(
+                  `⚠️ Submission failed. Server responded with status: ${response.status}`,
+                );
+              }
+            } catch (error) {
+              // Network error (e.g., server offline)
+              console.error(
+                "Network or unexpected error during submission:",
+                error,
+              );
+              alert(
+                "❌ An error occurred. Could not connect to the submission server.",
+              );
             }
-        } catch (error) {
-            // Network error (e.g., server offline)
-            console.error("Network or unexpected error during submission:", error);
-            alert("❌ An error occurred. Could not connect to the submission server.");
+
+            // Always add validation class for immediate visual feedback after attempt
+            form.classList.add("was-validated");
+          },
+          false,
+        );
+      })();
+
+      // Initialize on load
+      updateRepresentativeSection();
+      document
+        .querySelector('input[name="patientIsMember"]:checked')
+        .dispatchEvent(new Event("change"));
+    </script>
+    <script>
+      let leyteData = {};
+      let leyteBrgy = {};
+
+      fetch("{{ url_for('static', filename='data/municipalities.json') }}")
+        .then((response) => response.json())
+        .then((data) => {
+          leyteData = data;
+          populateMunicipalities();
+        })
+        .catch((error) => console.error("Error loading JSON:", error));
+
+      fetch("{{ url_for('static', filename='data/barangays.json') }}")
+        .then((response) => response.json())
+        .then((data) => {
+          leyteBrgy = data;
+        })
+        .catch((error) => console.error("Error loading JSON:", error));
+
+      function populateMunicipalities() {
+        const municipalitySelect = document.getElementById("municipality");
+
+        for (let iteration in leyteData) {
+          const option = document.createElement("option");
+          option.value = leyteData[iteration].name;
+          option.text = leyteData[iteration].name;
+          municipalitySelect.appendChild(option);
         }
-        
-        // Always add validation class for immediate visual feedback after attempt
-        form.classList.add('was-validated');
+      }
 
-    }, false);
-})()
+      document
+        .getElementById("municipality")
+        .addEventListener("change", function () {
+          const barangaySelect = document.getElementById("barangay");
+          barangaySelect.innerHTML =
+            '<option value="">-- Select Barangay --</option>';
+          const selectedMunicipality = this.value;
+          const filterBrgy = leyteBrgy.filter(
+            (item) => item.citymun === selectedMunicipality,
+          );
 
-            // Initialize on load
-            updateRepresentativeSection();
-            document.querySelector('input[name="patientIsMember"]:checked').dispatchEvent(new Event('change'));
-        </script>
-        <script>
-            let leyteData = {};
-            let leyteBrgy = {};
-
-            fetch("{{ url_for('static', filename='data/municipalities.json') }}")
-                .then(response => response.json())
-                .then(data => {
-                    leyteData = data;
-                    populateMunicipalities();
-                })
-                .catch(error => console.error("Error loading JSON:",error))
-
-            fetch("{{ url_for('static', filename='data/barangays.json') }}")
-                .then(response => response.json())
-                .then(data => {
-                    leyteBrgy = data;
-                })
-                .catch(error => console.error("Error loading JSON:",error))
-            
-            function populateMunicipalities(){
-                const municipalitySelect = document.getElementById("municipality");
-
-                for(let iteration in leyteData){
-                    const option = document.createElement('option');
-                    option.value = leyteData[iteration].name
-                    option.text = leyteData[iteration].name
-                    municipalitySelect.appendChild(option);
-                }
-      
-            }
-
-            document.getElementById('municipality').addEventListener("change", function () {
-                const barangaySelect = document.getElementById("barangay");
-                barangaySelect.innerHTML = '<option value="">-- Select Barangay --</option>';
-                const selectedMunicipality = this.value;
-                const filterBrgy = leyteBrgy.filter(
-                    item => item.citymun === selectedMunicipality
-                )
-
-                filterBrgy.forEach( brgy => {
-                    const option = document.createElement("option");
-                    option.value = brgy.name
-                    option.text = brgy.name
-                    barangaySelect.appendChild(option)
-                })
-
-            })
-            
-
-        </script>
-    </body>
+          filterBrgy.forEach((brgy) => {
+            const option = document.createElement("option");
+            option.value = brgy.name;
+            option.text = brgy.name;
+            barangaySelect.appendChild(option);
+          });
+        });
+    </script>
+  </body>
 </html>
