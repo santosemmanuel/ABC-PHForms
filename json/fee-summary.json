@@ -1,4 +1,55 @@
-[
+{
+  "Senior": [
+  {
+    "label": "Room and Board",
+    "amount": 0.0,
+    "discount": 0,
+    "philhealth": "-",
+    "otherFunding": "-",
+    "balance": "-"
+  },
+  {
+    "label": "Drugs and Medicines",
+    "amount": 5110.0,
+    "discount": 0,
+    "philhealth": "-",
+    "otherFunding": "-",
+    "balance": "-"
+  },
+  {
+    "label": "Laboratory and Diagnostics",
+    "amount": 0.0,
+    "discount": 0,
+    "philhealth": "-",
+    "otherFunding": "-",
+    "balance": "-"
+  },
+  {
+    "label": "Operating Room Fees",
+    "amount": 0.0,
+    "discount": 0,
+    "philhealth": "-",
+    "otherFunding": "-",
+    "balance": "-"
+  },
+  {
+    "label": "Medical Supplies",
+    "amount": 440.0,
+    "discount": 0,
+    "philhealth": "-",
+    "otherFunding": "-",
+    "balance": "-"
+  },
+  {
+    "label": "Others",
+    "amount": 545.0,
+    "discount": 0,
+    "philhealth": "-",
+    "otherFunding": "-",
+    "balance": "-"
+  }
+],
+"Regular": [  
   {
     "label": "Room and Board",
     "amount": 0.0,
@@ -48,3 +99,4 @@
     "balance": "-"
   }
 ]
+}

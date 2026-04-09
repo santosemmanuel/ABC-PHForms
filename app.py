@@ -24,6 +24,7 @@ app.secret_key = "ABTC"
 # else:
 #     print("PDF does NOT have fillable form fields.")
 
+
 @app.route("/")
 def index():
     return render_template('index.html')
@@ -36,12 +37,13 @@ def submit_form():
     patient_data = dict(data)
     session['patient_data'] = patient_data
     print(pretty_json_string)
-    clean_files(["output_cf1.pdf", "output_cf2.pdf", "output_csf.pdf", "output_soa.pdf"], current_app.root_path)
+    clean_files(["output_cf1.pdf", "output_cf2.pdf",
+                "output_csf.pdf", "output_soa.pdf"], current_app.root_path)
 
     fill_cf1(patient_data)
     fill_csf(patient_data)
     fill_cf2(patient_data)
-    fill_soa(patient_data)
+    # fill_soa(patient_data)
 
     return jsonify({"status": "success", "message": "Form received"})
 
@@ -53,7 +55,8 @@ def view_print_pdf():
         {"name": "CF-2 Form", "url": "/static/pdfs/output_cf2.pdf"},
         {"name": "CSF Form", "url": "/static/pdfs/output_csf.pdf"},
     ]
-    statement = load_json(os.path.join(os.path.dirname(__file__), 'json', 'statement-data.json'))
+    statement = load_json(os.path.join(os.path.dirname(
+        __file__), 'json', 'statement-data.json'))
     patient = session.get('patient_data', {})
 
     patientName = " ".join(filter(None, [
@@ -70,19 +73,47 @@ def view_print_pdf():
 
     statement["patientInfo"]['left'][0]['value'] = patientName
     statement["patientInfo"]['left'][1]['value'] = patientAddress
-    statement["patientInfo"]['left'][2]['value'] = calculate_age(patient.get('dob', ''))
-    statement["patientInfo"]['right'][1]['value'] = format_datetime(patient.get('datetimeAdmitted', ''))
-    statement["patientInfo"]['right'][2]['value'] = format_datetime(patient.get('datetimeDischarged', ''))
+    statement["patientInfo"]['right'][0]['value'] = calculate_age_month_days(
+        patient.get('dob', ''))
+    statement["patientInfo"]['right'][1]['value'] = format_datetime(
+        patient.get('datetimeAdmitted', ''))
+    statement["patientInfo"]['right'][2]['value'] = format_datetime(
+        patient.get('datetimeDischarged', ''))
 
+    fee_summary = load_json(os.path.join(
+        os.path.dirname(__file__), 'json', 'fee-summary.json'))
+    professional_fees = load_json(os.path.join(
+        os.path.dirname(__file__), 'json', 'professional-fees.json'))
+    itemized_charges = load_json(os.path.join(
+        os.path.dirname(__file__), 'json', 'itemized-charges.json'))
 
-    fee_summary = load_json(os.path.join(os.path.dirname(__file__), 'json', 'fee-summary.json'))
-    professional_fees = load_json(os.path.join(os.path.dirname(__file__), 'json', 'professional-fees.json'))
-    itemized_charges = load_json(os.path.join(os.path.dirname(__file__), 'json', 'itemized-charges.json'))
+    patient_age = calculate_age(patient.get('dob', ''))
+
+    if patient_age >= 60:
+        fee_summary = fee_summary['Senior']
+        professional_fees = professional_fees['Senior']
+        itemized_charges = itemized_charges['Senior']
+    else:
+        fee_summary = fee_summary['Regular']
+        professional_fees = professional_fees['Regular']
+
+        if patient_age < 1:
+            itemized_charges = itemized_charges['Below1']
+        elif patient_age >= 1 and patient_age <= 5:
+            itemized_charges = itemized_charges['OneToFive']
+        else:
+            itemized_charges = itemized_charges['Regular']
+
+    today_str = date.today().strftime('%b %d, %Y')
+
+    for item_date in itemized_charges:
+        item_date['date'] = today_str
+
     return render_template('viewPrintPDF.html', pdf_files=pdf_files,  header=statement['header'],
-                         patient_info=statement['patientInfo'],
-                         fee_summary=fee_summary,
-                         professional_fees=professional_fees,
-                         itemized_charges=itemized_charges)
+                           patient_info=statement['patientInfo'],
+                           fee_summary=fee_summary,
+                           professional_fees=professional_fees,
+                           itemized_charges=itemized_charges)
 
 
 def load_json(filename):
@@ -90,7 +121,8 @@ def load_json(filename):
         print()
         return json.load(f)
 
-def calculate_age(date_str):
+
+def calculate_age_month_days(date_str):
     # Convert string to date object
     year, month, day = map(int, date_str.split('-'))
     birth_date = date(year, month, day)
@@ -107,7 +139,7 @@ def calculate_age(date_str):
         # Get days in previous month
         prev_month = today.month - 1 if today.month > 1 else 12
         prev_year = today.year if today.month > 1 else today.year - 1
-        
+
         from calendar import monthrange
         days += monthrange(prev_year, prev_month)[1]
 
@@ -119,12 +151,27 @@ def calculate_age(date_str):
     return f"{years} years {months} months {days} days"
 
 
+def calculate_age(date_str):
+    # Convert string to date object
+    year, month, day = map(int, date_str.split('-'))
+    birth_date = date(year, month, day)
+    today = date.today()
+
+    # Calculate years
+    # This checks if the current date is before the birthday in the current year
+    age = today.year - birth_date.year - \
+        ((today.month, today.day) < (birth_date.month, birth_date.day))
+
+    return age
+
+
 def format_datetime(dt_string):
     # Convert string to datetime object
     dt = datetime.strptime(dt_string, "%Y-%m-%dT%H:%M:%S")
-    
+
     # Format to desired output
     return dt.strftime("%B %d, %Y %H:%M:%S")
+
 
 @app.route("/reports")
 def view_reports():

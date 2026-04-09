@@ -1,11 +1,21 @@
-[
-  {
+{
+  "Regular" : [{
     "accreditation": "1100-1945935-3",
     "physician": "MA. QUEENA JOVE QUIMSING SERRANO",
     "amount": 500,
     "discount": 0,
     "philhealth": 0.0,
     "otherFunding": "-",
-    "balance": 500.0
-  }
-]
+    "balance": 500
+  }],
+  "Senior": [{
+    "accreditation": "1100-1945935-3",
+    "physician": "MA. QUEENA JOVE QUIMSING SERRANO",
+    "amount": 625,
+    "discount": 0,
+    "philhealth": 0.0,
+    "otherFunding": "-",
+    "balance": 625
+  }]
+}
+
