@@ -148,7 +148,7 @@ def calculate_age_month_days(date_str):
         years -= 1
         months += 12
 
-    return f"{years} years {months} months {days} days"
+    return f"{years} year(s) {months} months {days} days"
 
 
 def calculate_age(date_str):
