@@ -167,6 +167,9 @@ def calculate_age(date_str):
 
 
 def format_datetime(dt_string):
+
+    if not dt_string:
+        return ""
     # Convert string to datetime object
     dt = datetime.strptime(dt_string, "%Y-%m-%dT%H:%M:%S")
 
