@@ -113,7 +113,8 @@ def view_print_pdf():
                            patient_info=statement['patientInfo'],
                            fee_summary=fee_summary,
                            professional_fees=professional_fees,
-                           itemized_charges=itemized_charges)
+                           itemized_charges=itemized_charges,
+                           philhealth_amount=5850.00)
 
 
 def load_json(filename):

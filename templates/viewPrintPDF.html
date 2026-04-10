@@ -404,10 +404,7 @@
                   >
                 </td>
                 <td class="right">
-                  <strong
-                    >{{ "{:,.2f}".format(fee_summary|selectattr('philhealth',
-                    'ne', '-') |sum(attribute='philhealth') or 0) }}</strong
-                  >
+                  <strong>{{ "{:,.2f}".format(philhealth_amount) }}</strong>
                 </td>
                 <td class="right">
                   <strong
