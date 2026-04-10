@@ -59,22 +59,38 @@ def view_print_pdf():
         __file__), 'json', 'statement-data.json'))
     patient = session.get('patient_data', {})
 
-    patientName = " ".join(filter(None, [
-        patient.get('firstName'),
-        patient.get('middleName'),
-        patient.get('lastName'),
-        patient.get('nameExt')
-    ]))
+    patientDOB = ""
+
+    if patient.get('dependent'):
+        dependent = patient.get('dependent', {})
+        patientName = " ".join(filter(None, [
+            dependent.get('depFname'),
+            dependent.get('depMname'),
+            dependent.get('depLname'),
+            dependent.get('depExt')
+        ]))
+        patientDOB = calculate_age_month_days(
+        dependent.get('depDob'))
+
+    else:
+        patientName = " ".join(filter(None, [
+            patient.get('firstName'),
+            patient.get('middleName'),
+            patient.get('lastName'),
+            patient.get('nameExt')
+        ]))
+        patientDOB = calculate_age_month_days(
+        patient.get('dob'))
 
     patientAddress = " ".join(filter(None, [
         patient.get('barangay'),
         patient.get('municipality') + ", Leyte",
     ]))
 
+
     statement["patientInfo"]['left'][0]['value'] = patientName
     statement["patientInfo"]['left'][1]['value'] = patientAddress
-    statement["patientInfo"]['right'][0]['value'] = calculate_age_month_days(
-        patient.get('dob', ''))
+    statement["patientInfo"]['right'][0]['value'] = patientDOB
     statement["patientInfo"]['right'][1]['value'] = format_datetime(
         patient.get('datetimeAdmitted', ''))
     statement["patientInfo"]['right'][2]['value'] = format_datetime(

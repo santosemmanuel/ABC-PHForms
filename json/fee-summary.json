@@ -10,8 +10,8 @@
     },
     {
       "label": "Drugs and Medicines",
-      "amount": 5310.0,
-      "discount": 1062,
+      "amount": 5704.0,
+      "discount": 1140.8,
       "philhealth": "-",
       "otherFunding": "-",
       "balance": "-"
@@ -34,8 +34,8 @@
     },
     {
       "label": "Medical Supplies",
-      "amount": 440.0,
-      "discount": 88,
+      "amount": 438.5,
+      "discount": 87.7,
       "philhealth": "-",
       "otherFunding": "-",
       "balance": "-"

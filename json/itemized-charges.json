@@ -206,9 +206,9 @@
       "date": "Feb 23, 2026",
       "item": "ANTI-TETANUS SERUM (ATS) (EQUINE) 1500 IU/mL SOLUTION 5 mL VIAL",
       "unit": "1500 IU/mL",
-      "price": 300,
+      "price": 444,
       "qty": 1,
-      "amount": 300
+      "amount": 444
     },
     {
       "date": "Feb 23, 2026",
@@ -222,9 +222,9 @@
       "date": "Feb 23, 2026",
       "item": "GLOVES - SURGICAL 7 1/2",
       "unit": "PAIR",
-      "price": 30,
+      "price": 28.5,
       "qty": 1,
-      "amount": 30
+      "amount": 28.5
     },
     {
       "date": "Feb 23, 2026",
@@ -236,7 +236,7 @@
     },
     {
       "date": "Feb 23, 2026",
-      "item": "TETANUS TOXIOD 0.5 mL SOLUTION AMPULE",
+      "item": "TETANU`S TOXIOD 0.5 mL SOLUTION AMPULE",
       "unit": "",
       "price": 450,
       "qty": 1,
