@@ -519,7 +519,7 @@
                 & Discharge Details
               </div>
               <div class="row">
-                    <div class="mt-1 mx-1 mb-3">
+                  <div class="mt-1 mx-1 mb-3">
                     <label>Date & Time Admitted:</label>
                     <input
                         type="datetime-local"
@@ -529,16 +529,16 @@
                     />
                   </div>
                   <div class="m-1 mt-1 mx-1 mb-3">
-                  <label>Date & Time Discharged:</label>
-                  <input
-                    type="datetime-local"
-                    class="form-control"
-                    name="datetimeDischarged"
-                    step="1"
-                  />
+                    <label>Date & Time Discharged:</label>
+                    <input
+                      type="datetime-local"
+                      class="form-control"
+                      name="datetimeDischarged"
+                      step="1"
+                    />
                   </div>
-                </form>
               </div>
+            </div>
               <div
                 id="representativeSection"
                 class="row g-2 d-none p-3 border rounded bg-light mt-3"
@@ -658,11 +658,13 @@
             event.preventDefault();
             event.stopPropagation();
 
+            console.log(form.repName.value);
+
             // Check if the form is valid according to HTML5/Bootstrap validation
-            if (!form.checkValidity()) {
-              form.classList.add("was-validated");
-              return; // Stop if validation fails
-            }
+            // if (!form.checkValidity()) {
+            //   form.classList.add("was-validated");
+            //   return; // Stop if validation fails
+            // }
 
             // --- Form is valid, proceed with data collection and submission ---
 
@@ -717,29 +719,29 @@
             try {
               console.log("Attempting to submit data to /submit_form:", data);
 
-              const response = await fetch("/submit_form", {
-                method: "POST",
-                headers: {
-                  "Content-Type": "application/json",
-                },
-                // Convert the JavaScript object to a JSON string
-                body: JSON.stringify(data),
-              });
+              // const response = await fetch("/submit_form", {
+              //   method: "POST",
+              //   headers: {
+              //     "Content-Type": "application/json",
+              //   },
+              //   // Convert the JavaScript object to a JSON string
+              //   body: JSON.stringify(data),
+              // });
 
-              if (response.ok) {
-                // Submission was successful (e.g., status 200-299)
-                alert("✅ MHO Burauen Form submitted successfully!");
-                window.location.href = "/view_print";
-                form.reset(); // Clear the form fields
-                form.classList.remove("was-validated"); // Remove validation state
-              } else {
-                // Submission failed on the server side (e.g., status 400 or 500)
-                const errorText = await response.text();
-                console.error("Submission failed:", errorText);
-                alert(
-                  `⚠️ Submission failed. Server responded with status: ${response.status}`,
-                );
-              }
+              // if (response.ok) {
+              //   // Submission was successful (e.g., status 200-299)
+              //   alert("✅ MHO Burauen Form submitted successfully!");
+              //   window.location.href = "/view_print";
+              //   form.reset(); // Clear the form fields
+              //   form.classList.remove("was-validated"); // Remove validation state
+              // } else {
+              //   // Submission failed on the server side (e.g., status 400 or 500)
+              //   const errorText = await response.text();
+              //   console.error("Submission failed:", errorText);
+              //   alert(
+              //     `⚠️ Submission failed. Server responded with status: ${response.status}`,
+              //   );
+              // }
             } catch (error) {
               // Network error (e.g., server offline)
               console.error(
