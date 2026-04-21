@@ -102,8 +102,11 @@ def view_print_pdf():
         os.path.dirname(__file__), 'json', 'professional-fees.json'))
     itemized_charges = load_json(os.path.join(
         os.path.dirname(__file__), 'json', 'itemized-charges.json'))
-
+    
+    patient_dependent = patient.get('dependent', {})
     patient_age = calculate_age(patient.get('dob', ''))
+    if patient.get('patientIsMember') == "no":
+        patient_age = calculate_age(patient_dependent.get('depDob', ''))
 
     if patient_age >= 60:
         fee_summary = fee_summary['Senior']

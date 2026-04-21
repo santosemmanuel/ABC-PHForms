@@ -519,58 +519,23 @@
                 & Discharge Details
               </div>
               <div class="row">
-                  <div class="mt-1 mx-1 mb-3">
-                    <label>Date & Time Admitted:</label>
-                    <input
-                        type="datetime-local"
-                        class="form-control"
-                        name="datetimeAdmitted"
-                        step="1"
-                    />
-                  </div>
-                  <div class="m-1 mt-1 mx-1 mb-3">
-                    <label>Date & Time Discharged:</label>
-                    <input
-                      type="datetime-local"
-                      class="form-control"
-                      name="datetimeDischarged"
-                      step="1"
-                    />
-                  </div>
-              </div>
-            </div>
-              <div
-                id="representativeSection"
-                class="row g-2 d-none p-3 border rounded bg-light mt-3"
-              >
-                <div class="col-12">
-                  <div class="group-title mt-0 text-dark">
-                    Representative Details
-                  </div>
-                </div>
-                <div class="col-md-12 mb-2-5">
+                <div class="mt-1 mx-1 mb-3">
+                  <label>Date & Time Admitted:</label>
                   <input
+                    type="datetime-local"
                     class="form-control"
-                    name="repName"
-                    placeholder="Representative Full Name"
+                    name="datetimeAdmitted"
+                    step="1"
                   />
                 </div>
-                <div class="col-md-6 mb-2-5">
-                  <select class="form-select" name="repRelationship">
-                    <option value="">Relationship</option>
-                    <option>Spouse</option>
-                    <option>Child</option>
-                    <option>Parent</option>
-                    <option>Sibling</option>
-                    <option>Others</option>
-                  </select>
-                </div>
-                <div class="col-md-6 mb-2-5">
-                  <select class="form-select" name="repReason">
-                    <option value="">Reason for Representation</option>
-                    <option>Member is incapacitated</option>
-                    <option>Others</option>
-                  </select>
+                <div class="m-1 mt-1 mx-1 mb-3">
+                  <label>Date & Time Discharged:</label>
+                  <input
+                    type="datetime-local"
+                    class="form-control"
+                    name="datetimeDischarged"
+                    step="1"
+                  />
                 </div>
               </div>
             </div>
@@ -655,10 +620,9 @@
           "submit",
           async function (event) {
             // Prevent default submission behavior
+
             event.preventDefault();
             event.stopPropagation();
-
-            console.log(form.repName.value);
 
             // Check if the form is valid according to HTML5/Bootstrap validation
             // if (!form.checkValidity()) {
@@ -701,7 +665,7 @@
                   : null,
               signee: form.signee.value,
               representative:
-                form.signee.value === "representative"
+                form.signee.value == "representative"
                   ? {
                       repName: form.repName.value,
                       repRelationship: form.repRelationship.value,
@@ -711,37 +675,37 @@
               patientDisposition:
                 form.querySelector("select[name='patientDisposition']")
                   ?.value || "",
-                datetimeAdmitted: form.datetimeAdmitted.value,
-                datetimeDischarged: form.datetimeDischarged.value,
+              datetimeAdmitted: form.datetimeAdmitted.value,
+              datetimeDischarged: form.datetimeDischarged.value,
             };
 
             // ** NEW SUBMISSION VIA FETCH API TO /submit_form **
             try {
               console.log("Attempting to submit data to /submit_form:", data);
 
-              // const response = await fetch("/submit_form", {
-              //   method: "POST",
-              //   headers: {
-              //     "Content-Type": "application/json",
-              //   },
-              //   // Convert the JavaScript object to a JSON string
-              //   body: JSON.stringify(data),
-              // });
+              const response = await fetch("/submit_form", {
+                method: "POST",
+                headers: {
+                  "Content-Type": "application/json",
+                },
+                // Convert the JavaScript object to a JSON string
+                body: JSON.stringify(data),
+              });
 
-              // if (response.ok) {
-              //   // Submission was successful (e.g., status 200-299)
-              //   alert("✅ MHO Burauen Form submitted successfully!");
-              //   window.location.href = "/view_print";
-              //   form.reset(); // Clear the form fields
-              //   form.classList.remove("was-validated"); // Remove validation state
-              // } else {
-              //   // Submission failed on the server side (e.g., status 400 or 500)
-              //   const errorText = await response.text();
-              //   console.error("Submission failed:", errorText);
-              //   alert(
-              //     `⚠️ Submission failed. Server responded with status: ${response.status}`,
-              //   );
-              // }
+              if (response.ok) {
+                // Submission was successful (e.g., status 200-299)
+                alert("✅ MHO Burauen Form submitted successfully!");
+                window.location.href = "/view_print";
+                form.reset(); // Clear the form fields
+                form.classList.remove("was-validated"); // Remove validation state
+              } else {
+                // Submission failed on the server side (e.g., status 400 or 500)
+                const errorText = await response.text();
+                console.error("Submission failed:", errorText);
+                alert(
+                  `⚠️ Submission failed. Server responded with status: ${response.status}`,
+                );
+              }
             } catch (error) {
               // Network error (e.g., server offline)
               console.error(
