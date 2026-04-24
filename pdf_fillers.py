@@ -126,7 +126,7 @@ def fill_cf1(data):
             form_fields_cf1[form_fields_cf1.index("dependentFemale")]: depFemale,
             form_fields_cf1[form_fields_cf1.index("memberCertSignature")]: memberPrintedName,
             form_fields_cf1[form_fields_cf1.index("memberCertRepSignature")]: repPrintedName,
-            form_fields_cf1[form_fields_cf1.index("memberDateSignedMonth")]: "01",
+            form_fields_cf1[form_fields_cf1.index("memberDateSignedMonth")]: memberSignDate[0],
             form_fields_cf1[form_fields_cf1.index("memberDateSignedDay")]: memberSignDate[1],
             form_fields_cf1[form_fields_cf1.index("memberDateSignedYear")]: memberSignDate[2],
             form_fields_cf1[form_fields_cf1.index("repDateSginedMonth")]: repSignDate[0],
